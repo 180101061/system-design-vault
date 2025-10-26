@@ -1,0 +1,45 @@
+site_name: System Design Vault
+site_description: Visual notes and system design explanations with diagrams
+site_url: https://180101061.github.io/system-design-vault/
+repo_url: https://github.com/180101061/system-design-vault
+repo_name: 180101061/system-design-vault
+
+theme:
+  name: material
+  logo: assets/logo.png
+  favicon: assets/logo.png
+  palette:
+    - scheme: slate
+      primary: indigo
+      accent: teal
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - search.suggest
+    - search.highlight
+    - content.code.annotate
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - footnotes
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.tasklist
+  - pymdownx.emoji
+  - pymdownx.tabbed
+  - attr_list
+
+nav:
+  - Home: index.md
+  - Fundamentals:
+      - CAP Theorem: Fundamentals/CAP Theorem.md
+      - Scalability Patterns: Fundamentals/Scalability Patterns.md
+  - Case Studies:
+      - URL Shortener: CaseStudies/URL Shortener.md
+      - Load Balancer: CaseStudies/Load Balancer.md
+  - Diagrams:
+      - URL Shortener: Diagrams/url_shortener.png
