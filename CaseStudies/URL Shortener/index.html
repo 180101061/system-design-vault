@@ -554,15 +554,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#diagram" class="md-nav__link">
-    <span class="md-ellipsis">
-      Diagram
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -708,15 +699,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#diagram" class="md-nav__link">
-    <span class="md-ellipsis">
-      Diagram
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -739,6 +721,81 @@
 <h1 id="url-shortener-system-design">URL Shortener System Design<a class="headerlink" href="#url-shortener-system-design" title="Permanent link">&para;</a></h1>
 <h3 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h3>
 <p>Design a scalable URL shortening service.</p>
+<h1 id="url-shortener-qa">URL Shortener — Q&amp;A<a class="headerlink" href="#url-shortener-qa" title="Permanent link">&para;</a></h1>
+<p>A Q&amp;A style reference for the URL Shortener system design.</p>
+<hr />
+<h2 id="q1-what-is-a-url-shortener">Q1: What is a URL Shortener?<a class="headerlink" href="#q1-what-is-a-url-shortener" title="Permanent link">&para;</a></h2>
+<p><strong>Answer:</strong><br />
+A URL Shortener is a service that converts a long URL into a short, unique, and easily shareable URL.<br />
+Example:
+<div class="highlight"><pre><span></span><code>Original: https://www.example.com/articles/2025/long-article-title  
+Short: https://short.ly/abc123
+</code></pre></div></p>
+<hr />
+<h2 id="q2-what-are-the-key-features-of-a-url-shortener">Q2: What are the key features of a URL Shortener?<a class="headerlink" href="#q2-what-are-the-key-features-of-a-url-shortener" title="Permanent link">&para;</a></h2>
+<p><strong>Answer:</strong><br />
+1. Generate unique short URLs.<br />
+2. Redirect users from short URL to the original long URL.<br />
+3. Track usage analytics (optional).<br />
+4. Handle collisions gracefully.<br />
+5. Support custom aliases (optional).  </p>
+<hr />
+<h2 id="q3-what-are-the-main-components-of-a-url-shortener-system">Q3: What are the main components of a URL Shortener system?<a class="headerlink" href="#q3-what-are-the-main-components-of-a-url-shortener-system" title="Permanent link">&para;</a></h2>
+<p><strong>Answer:</strong><br />
+1. <strong>API Server</strong> — Accepts requests to create or retrieve URLs.<br />
+2. <strong>Database</strong> — Stores the mapping between short and long URLs.<br />
+3. <strong>Cache</strong> — (Optional) For faster redirection using systems like Redis.<br />
+4. <strong>Hashing / Encoding Logic</strong> — Converts long URL to short key.<br />
+5. <strong>Frontend / Dashboard</strong> — Optional UI for users.  </p>
+<hr />
+<h2 id="q4-how-do-you-generate-a-unique-short-url-key">Q4: How do you generate a unique short URL key?<a class="headerlink" href="#q4-how-do-you-generate-a-unique-short-url-key" title="Permanent link">&para;</a></h2>
+<p><strong>Answer:</strong><br />
+- <strong>Hashing the long URL</strong> (e.g., MD5, SHA) → Base62 encoded.<br />
+- <strong>Random string generation</strong> (6-8 characters).<br />
+- <strong>Incremental ID</strong> → encode to Base62.  </p>
+<p><strong>Considerations:</strong><br />
+- Avoid collisions.<br />
+- Make the key short and URL-friendly.<br />
+- Optionally allow custom aliases.  </p>
+<hr />
+<h2 id="q5-how-to-handle-collisions">Q5: How to handle collisions?<a class="headerlink" href="#q5-how-to-handle-collisions" title="Permanent link">&para;</a></h2>
+<p><strong>Answer:</strong><br />
+- Check the database if the generated key already exists.<br />
+- If yes, regenerate a new key (loop until unique).<br />
+- Use probabilistic approaches (like using longer keys for high volume).  </p>
+<hr />
+<h2 id="q6-what-databases-can-we-use">Q6: What databases can we use?<a class="headerlink" href="#q6-what-databases-can-we-use" title="Permanent link">&para;</a></h2>
+<p><strong>Answer:</strong><br />
+- <strong>Relational DBs:</strong> MySQL, PostgreSQL — easy mapping with unique constraints.<br />
+- <strong>NoSQL:</strong> DynamoDB, MongoDB — good for scalability.<br />
+- <strong>In-memory cache:</strong> Redis or Memcached — for fast redirection.  </p>
+<hr />
+<h2 id="q7-how-to-scale-a-url-shortener">Q7: How to scale a URL Shortener?<a class="headerlink" href="#q7-how-to-scale-a-url-shortener" title="Permanent link">&para;</a></h2>
+<p><strong>Answer:</strong><br />
+1. <strong>Database Sharding</strong> — Distribute the mappings across multiple DBs.<br />
+2. <strong>Caching</strong> — Use Redis to store hot keys.<br />
+3. <strong>Load Balancing</strong> — Multiple API servers.<br />
+4. <strong>CDN for redirect</strong> — Optional for global low-latency redirection.  </p>
+<hr />
+<h2 id="q8-how-to-ensure-high-availability">Q8: How to ensure high availability?<a class="headerlink" href="#q8-how-to-ensure-high-availability" title="Permanent link">&para;</a></h2>
+<p><strong>Answer:</strong><br />
+- Use replicated databases.<br />
+- Multi-zone deployment of API servers.<br />
+- Backup and restore strategies for URL mappings.  </p>
+<hr />
+<h2 id="q9-what-security-considerations-exist">Q9: What security considerations exist?<a class="headerlink" href="#q9-what-security-considerations-exist" title="Permanent link">&para;</a></h2>
+<p><strong>Answer:</strong><br />
+- Validate long URLs to prevent phishing/malware.<br />
+- Rate-limit API requests.<br />
+- Use HTTPS for all short URLs.<br />
+- Optional: authentication for creating custom URLs.  </p>
+<hr />
+<h2 id="q10-optional-enhancements">Q10: Optional enhancements<a class="headerlink" href="#q10-optional-enhancements" title="Permanent link">&para;</a></h2>
+<p><strong>Answer:</strong><br />
+- Expiration time for short URLs.<br />
+- Analytics dashboard: clicks, geography, referrer.<br />
+- Custom vanity URLs.<br />
+- QR code generation.  </p>
 <h3 id="diagram">Diagram<a class="headerlink" href="#diagram" title="Permanent link">&para;</a></h3>
 <p><img alt="URL Shortener Diagram" src="../../Diagrams/url_shortener.png" /></p>
 
