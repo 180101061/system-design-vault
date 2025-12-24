@@ -1,0 +1,118 @@
+{
+  "settings": {
+    "CUSTOM_REGEXPS": {
+      "Basic": "",
+      "Basic (and reversed card)": "",
+      "Basic (optional reversed card)": "",
+      "Basic (type in the answer)": "",
+      "Cloze": "",
+      "Image Occlusion": ""
+    },
+    "FILE_LINK_FIELDS": {
+      "Basic": "Front",
+      "Basic (and reversed card)": "Front",
+      "Basic (optional reversed card)": "Front",
+      "Basic (type in the answer)": "Front",
+      "Cloze": "Text",
+      "Image Occlusion": "Occlusion"
+    },
+    "CONTEXT_FIELDS": {},
+    "FOLDER_DECKS": {
+      "docs": "",
+      "site": "",
+      "docs/CaseStudies": "",
+      "docs/Diagrams": "",
+      "site/assets": "",
+      "site/CaseStudies": "",
+      "site/Diagrams": "",
+      "site/search": "",
+      "site/assets/images": "",
+      "site/assets/javascripts": "",
+      "site/assets/stylesheets": "",
+      "site/CaseStudies/URL Shortener": "",
+      "site/Diagrams/url_shortener.excalidraw": "",
+      "site/assets/javascripts/lunr": "",
+      "site/assets/javascripts/workers": "",
+      "site/assets/javascripts/lunr/min": ""
+    },
+    "FOLDER_TAGS": {
+      "docs": "",
+      "site": "",
+      "docs/CaseStudies": "",
+      "docs/Diagrams": "",
+      "site/assets": "",
+      "site/CaseStudies": "",
+      "site/Diagrams": "",
+      "site/search": "",
+      "site/assets/images": "",
+      "site/assets/javascripts": "",
+      "site/assets/stylesheets": "",
+      "site/CaseStudies/URL Shortener": "",
+      "site/Diagrams/url_shortener.excalidraw": "",
+      "site/assets/javascripts/lunr": "",
+      "site/assets/javascripts/workers": "",
+      "site/assets/javascripts/lunr/min": ""
+    },
+    "Syntax": {
+      "Begin Note": "START",
+      "End Note": "END",
+      "Begin Inline Note": "STARTI",
+      "End Inline Note": "ENDI",
+      "Target Deck Line": "TARGET DECK",
+      "File Tags Line": "FILE TAGS",
+      "Delete Note Line": "DELETE",
+      "Frozen Fields Line": "FROZEN"
+    },
+    "Defaults": {
+      "Scan Directory": "",
+      "Tag": "Obsidian_to_Anki",
+      "Deck": "Default",
+      "Scheduling Interval": 0,
+      "Add File Link": false,
+      "Add Context": false,
+      "CurlyCloze": false,
+      "CurlyCloze - Highlights to Clozes": false,
+      "ID Comments": true,
+      "Add Obsidian Tags": false
+    },
+    "IGNORED_FILE_GLOBS": [
+      "**/*.excalidraw.md"
+    ]
+  },
+  "Added Media": [],
+  "File Hashes": {
+    "README.md": "0285ecae10beed5c1ce3920f1f69e94c",
+    "docs/index.md": "4ce8ba5cf17832db9a049d89a8a20aa3",
+    "docs/CaseStudies/URL Shortener.md": "d7a5a463daaa2295631171ac4dadd5ac"
+  },
+  "fields_dict": {
+    "Basic": [
+      "Front",
+      "Back"
+    ],
+    "Basic (and reversed card)": [
+      "Front",
+      "Back"
+    ],
+    "Basic (optional reversed card)": [
+      "Front",
+      "Back",
+      "Add Reverse"
+    ],
+    "Basic (type in the answer)": [
+      "Front",
+      "Back"
+    ],
+    "Cloze": [
+      "Text",
+      "Back Extra"
+    ],
+    "Image Occlusion": [
+      "Occlusion",
+      "Image",
+      "Header",
+      "Back Extra",
+      "Comments"
+    ]
+  }
+}
