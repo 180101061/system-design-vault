@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "e39faaafe0717049",
+        "id": "e52cfca6198988e9",
         "type": "tabs",
         "children": [
           {
-            "id": "81af187dd8497efb",
+            "id": "9203428fc1b0141c",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Welcome.md",
+                "file": "docs/CaseStudies/URL Shortener.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Welcome"
+              "title": "Backlinks for URL Shortener"
             }
           },
           {
@@ -155,7 +155,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
+    "width": 200,
     "collapsed": true
   },
   "left-ribbon": {
@@ -166,30 +166,37 @@
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
       "command-palette:Open command palette": false,
-      "bases:Create new base": false
+      "bases:Create new base": false,
+      "obsidian-excalidraw-plugin:New drawing": false,
+      "obsidian-git:Open Git source control": false,
+      "obsidian-to-anki-plugin:Obsidian_to_Anki - Scan Vault": false
     }
   },
-  "active": "81af187dd8497efb",
+  "active": "9203428fc1b0141c",
   "lastOpenFiles": [
-    "docs/index.md",
+    "site/404.html",
+    "site/assets/javascripts/lunr/min/lunr.hi.min.js",
+    "site/assets/javascripts/lunr/min/lunr.he.min.js",
+    "site/assets/javascripts/lunr/min/lunr.fr.min.js",
+    "site/assets/javascripts/lunr/min/lunr.fi.min.js",
+    "site/assets/javascripts/lunr/min/lunr.es.min.js",
+    "site/Diagrams/url_shortner.drawio.svg",
+    "docs/Diagrams/url_shortener.png",
+    "Diagrams.md",
     "docs/CaseStudies/URL Shortener.md",
+    "docs/Diagrams/url_shortner.drawio.svg",
+    "docs/Diagrams/url_shortener.excalidraw.md",
     "README.md",
-    "site/search/search_index.json",
-    "site/search",
-    "site/Diagrams/url_shortener.excalidraw/index.html",
-    "site/Diagrams/url_shortener.excalidraw",
-    "site/CaseStudies/URL Shortener/index.html",
-    "site/CaseStudies/URL Shortener",
-    "site/CaseStudies",
-    "site/index.html",
-    "site/sitemap.xml.gz",
-    "site/sitemap.xml",
+    "10. Storage Engines - II.mp4",
+    "9. Storage Engines - I.mp4",
+    "8. Building Social Network - II.mp4",
+    "4 UTTRAKHAND GK MCQ 2025 File-4.pdf",
+    "UK PCSJ MOCK 01_18-08-2025 (1).pdf",
     "site/assets/images/favicon.png",
+    "docs/index.md",
     "site/Diagrams/url_shortener.png",
     "site/img/grid.png",
     "docs/README.md",
-    "docs/Diagrams/url_shortener.png",
-    "docs/Diagrams/url_shortener.excalidraw.md",
     "SystemDesignVault/README.md",
     "SystemDesignVault/Index.md",
     "SystemDesignVault/Diagrams/url_shortener.png",

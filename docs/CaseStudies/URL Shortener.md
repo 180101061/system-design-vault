@@ -3,6 +3,7 @@
 ### Overview
 Design a scalable URL shortening service.
 
+
 # URL Shortener — Q&A
 
 A Q&A style reference for the URL Shortener system design.
@@ -10,7 +11,8 @@ A Q&A style reference for the URL Shortener system design.
 ---
 
 ## Q1: What is a URL Shortener?
-
+**Front:** What is a URL Shortener?  
+**Back:**  
 **Answer:**  
 A URL Shortener is a service that converts a long URL into a short, unique, and easily shareable URL.  
 Example:
@@ -113,4 +115,4 @@ Short: https://short.ly/abc123
 
 
 ### Diagram
-![URL Shortener Diagram](../Diagrams/url_shortener.png)
+[![URL Shortener HLD](../Diagrams/url_shortner.drawio.svg)](../Diagrams/url_shortner.drawio.svg)
