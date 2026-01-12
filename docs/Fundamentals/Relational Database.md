@@ -1,7 +1,7 @@
 ## 1. What is Data?
 
 **Data** is raw information that represents facts, observations, or measurements.
-### Examples
+**Examples:**
 
 - A name: `Ram`
 - A number: `25`
@@ -31,12 +31,12 @@ Instead of storing data in files (like text files or Excel), databases provide:
 
 In a **Relational Database**, data is stored in **tables**.
 
-### Table Structure
+**Table Structure**
 
 - **Rows** → Individual records
 - **Columns** → Attributes (fields)
 
-### Example: `Users` Table
+**Example: `Users` Table**
 
 | id  | name | email                                   | age |
 | --- | ---- | --------------------------------------- | --- |
@@ -55,7 +55,7 @@ A **Relational Database** is a database that:
 - Establishes **relationships** between tables
 - Uses **keys** (Primary Key, Foreign Key) to maintain these relationships
 
-### Example of Relationship
+**Example of Relationship**
 
 **Orders Table**
 
@@ -298,7 +298,7 @@ Pick an RDBMS when:
 - You need **ACID transactions**
 - Data correctness is critical
 - Strong consistency is required
-### Common Use Cases
+**Common Use Cases**
 
 - Banking systems
 - Order management systems
@@ -327,3 +327,5 @@ Relational Databases:
 They are best suited for systems where **data correctness, reliability, and consistency** matter more than flexibility.
 
 ---
+---
+End of Notes

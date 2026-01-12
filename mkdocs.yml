@@ -37,6 +37,7 @@ nav:
   - Home: index.md
   - Fundamentals:
       - CAP Theorem: Fundamentals/CAP Theorem.md
+      - Relational Database: Fundamentals/Relational Database.md
       - Scalability Patterns: Fundamentals/Scalability Patterns.md
   - Case Studies:
       - URL Shortener: CaseStudies/URL Shortener.md
