@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Fundamentals/Relational Database.md",
+                "file": "docs/Fundamentals/Relational Database.md",
                 "mode": "source",
                 "source": false
               },
@@ -175,10 +175,14 @@
   "active": "9203428fc1b0141c",
   "lastOpenFiles": [
     "docs/index.md",
+    "docs/Fundamentals/Relational Database.md",
+    "docs/Fundamentals/CAP Theorem.md",
+    "docs/Fundamentals",
+    "README.md",
     "Fundamentals/Relational Database.md",
     "Fundamentals/CAP Theorem.md",
-    "Fundamentals",
     "docs/CaseStudies/URL Shortener.md",
+    "Fundamentals",
     "docs/Diagrams/url_shortner.drawio",
     "docs/Diagrams/Unconfirmed 371595.crdownload",
     "site/404.html",
@@ -192,8 +196,6 @@
     "Diagrams.md",
     "docs/Diagrams/url_shortner.drawio.svg",
     "docs/Diagrams/url_shortener.excalidraw.md",
-    "README.md",
-    "10. Storage Engines - II.mp4",
     "site/assets/images/favicon.png",
     "site/Diagrams/url_shortener.png",
     "site/img/grid.png",
