@@ -11,6 +11,7 @@ Core concepts every system designer must know.
 
 - [CAP Theorem](Fundamentals/CAP%20Theorem.md)
 - [Relational Database](Fundamentals/Relational%20Database.md)
+-  [Database Isolation Levels ](Fundamentals/Database%20Isolation%20Levels.md)
 - [Scalability Patterns](Fundamentals/Scalability%20Patterns.md)
 
 ---
