@@ -1,4 +1,4 @@
-![[docs/Diagrams/DataBase_isolation_level.pdf]]
+![[Database_isolation_level_full.png]]
 
 This document explains **isolation levels in database**, using **real examples**, **two transactions**.
 
