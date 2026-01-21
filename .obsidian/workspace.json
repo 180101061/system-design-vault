@@ -34,9 +34,37 @@
               "icon": "lucide-file",
               "title": "Database Isolation Levels"
             }
+          },
+          {
+            "id": "ef71d19010e4ec69",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "docs/index.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "index"
+            }
+          },
+          {
+            "id": "56a387726769031a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "docs/index.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "index"
+            }
           }
         ],
-        "currentTab": 1
+        "currentTab": 3
       }
     ],
     "direction": "vertical"
@@ -187,29 +215,34 @@
       "obsidian-to-anki-plugin:Obsidian_to_Anki - Scan Vault": false
     }
   },
-  "active": "fd4d9f6a1aca1712",
+  "active": "56a387726769031a",
   "lastOpenFiles": [
+    "docs/Fundamentals/Scaling Databases.md",
+    "docs/index.md",
+    "Fundamentals/Scalability Patterns.md",
+    "Fundamentals",
+    "docs/Fundamentals/Relational Database.md",
+    "docs/Fundamentals/Database Isolation Levels.md",
+    "docs/CaseStudies/URL Shortener.md",
+    "[].md",
+    "docs/Diagrams/Scaling_Datbase_AB.png",
+    "docs/Diagrams/Unconfirmed 597381.crdownload",
+    "docs/Diagrams/Scaling_Databases_AB.png",
+    "docs/Diagrams/Unconfirmed 71228.crdownload",
     "docs/Diagrams/Database_isolation_level_full.png",
+    "DataBase_isolation_level.pdf",
     "docs/Diagrams/DataBase_isolation_level_page-0001.jpg",
     "docs/Diagrams/DataBase_isolation_level_page-0002.jpg",
-    "docs/index.md",
-    "docs/Fundamentals/Database Isolation Levels.md",
     "docs/Diagrams/DataBase_isolation_level.pdf",
-    "DataBase_isolation_level.pdf",
-    "docs/Fundamentals/Relational Database.md",
     "docs/Fundamentals/CAP Theorem.md",
     "README.md",
     "docs/Fundamentals",
     "Fundamentals/Relational Database.md",
     "Fundamentals/CAP Theorem.md",
-    "docs/CaseStudies/URL Shortener.md",
-    "Fundamentals",
     "docs/Diagrams/url_shortner.drawio",
     "docs/Diagrams/Unconfirmed 371595.crdownload",
     "site/404.html",
     "site/assets/javascripts/lunr/min/lunr.hi.min.js",
-    "site/assets/javascripts/lunr/min/lunr.he.min.js",
-    "site/assets/javascripts/lunr/min/lunr.fr.min.js",
     "site/Diagrams/url_shortner.drawio.svg",
     "docs/Diagrams/url_shortener.png",
     "Diagrams.md",
@@ -217,23 +250,18 @@
     "docs/Diagrams/url_shortener.excalidraw.md",
     "site/assets/images/favicon.png",
     "site/Diagrams/url_shortener.png",
-    "site/img/grid.png",
     "docs/README.md",
     "SystemDesignVault/README.md",
     "SystemDesignVault/Index.md",
-    "SystemDesignVault/Diagrams/url_shortener.png",
     "SystemDesignVault/Diagrams/url_shortener.excalidraw.md",
     "SystemDesignVault/CaseStudies/URL Shortener.md",
     "docs/Index.md",
-    "Diagrams/url_shortener.png",
     "CaseStudies/URL Shortener.md",
     "Diagrams/url_shortener.excalidraw.md",
     "Index.md",
     "create a link.md",
     "Welcome.md",
     "Excalidraw/Untitled-2025-10-23-2335.excalidraw.md",
-    "Excalidraw/Drawing 2025-10-26 00.21.36.excalidraw.md",
-    "Excalidraw/Drawing 2025-10-26 00.21.18.excalidraw.md",
-    "Excalidraw/Drawing 2025-10-26 00.19.23.excalidraw.md"
+    "Excalidraw/Drawing 2025-10-26 00.21.36.excalidraw.md"
   ]
 }
