@@ -1,2 +1,2 @@
-[![Scaling Database](../Diagrams/Scaling_Datbase_AB.png)
+![Scaling Database](../Diagrams/Scaling_Datbase_AB.png)
 

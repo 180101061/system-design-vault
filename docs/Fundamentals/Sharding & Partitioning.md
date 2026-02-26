@@ -1,5 +1,5 @@
 ![Sharding and Partitioning](../Diagrams/Sharding_and_Partitioning.png)
-# Core Definitions
+## Core Definitions
 
 ### Partitioning
 Dividing a dataset into smaller logical pieces.
@@ -7,7 +7,7 @@ Dividing a dataset into smaller logical pieces.
 - **Horizontal partitioning** → Split by rows
 > Sharding = horizontal partitioning across multiple machines.
 ---
-# Why Sharding?
+## Why Sharding?
 ### Problems Without Sharding
 - Vertical scaling limit (CPU, RAM, Disk)
 - Single point of failure
@@ -19,8 +19,8 @@ Dividing a dataset into smaller logical pieces.
 - Fault isolation
 - Reduced index size per node
 ---
-# Types of Partitioning
-## A) Vertical Partitioning
+## Types of Partitioning
+### A) Vertical Partitioning
 Split by columns.
 Example:  
 User table:
@@ -29,68 +29,68 @@ Used for:
 - Reducing I/O
 - Separating hot vs cold data
 ---
-## B) Horizontal Partitioning (Sharding)
+### B) Horizontal Partitioning (Sharding)
 Split rows across shards:
 `Shard 1 → user_id 1–1M Shard 2 → user_id 1M–2M`
 
 ---
-# Sharding Strategies (Very Important)
+## Sharding Strategies (Very Important)
 ---
-## 4.1 Range-Based Sharding
+### 4.1 Range-Based Sharding
 Partition by value range.
 Example:
 `0–1000 → Shard 1 1001–2000 → Shard 2`
-### Pros
+#### Pros
 - Efficient range queries
 - Simple routing
-### Cons
+#### Cons
 - Hotspot risk
 - Uneven distribution
 - Difficult resharding
 ---
-## 4.2 Hash-Based Sharding
+### 4.2 Hash-Based Sharding
 `shard_id = hash(key) % N`
-### Pros
+#### Pros
 - Uniform distribution
 - Avoids skew (generally)
-### Cons
+#### Cons
 - Poor for range queries
 - Adding shard → full rehash
 ---
-## 4.3 Consistent Hashing (High-Value Topic)
+### 4.3 Consistent Hashing (High-Value Topic)
 Used in:
 - Apache Cassandra
 - Amazon DynamoDB
 - Redis Cluster
-### Core Idea
+#### Core Idea
 - Map nodes + keys on hash ring
 - Key assigned to next clockwise node
-### Key Advantage
+#### Key Advantage
 When adding/removing node:
 - Only small portion of keys move
 - No global rehash
-### Interview Line
+#### Interview Line
 
 > Consistent hashing minimizes key redistribution during cluster scaling.
 ---
-# Shard Key Selection (Extremely Important)
+## Shard Key Selection (Extremely Important)
 Bad shard key = production disaster.
-## Good Shard Key Properties
+### Good Shard Key Properties
 - High cardinality
 - Uniform distribution
 - Frequently used in queries
 - Immutable
 - Avoid monotonic growth
-## Bad Examples
+### Bad Examples
 - `country` → low cardinality
 - `created_at` → hotspot on latest shard
 - Boolean fields
-## Good Examples
+### Good Examples
 - `user_id`
 - `order_id`
 - UUID
 ---
-# Hotspot Problem
+## Hotspot Problem
 Even with hashing:
 - Celebrity accounts
 - Trending content
@@ -102,7 +102,7 @@ Even with hashing:
 - Write spreading
 - Rate limiting
 ---
-# Rebalancing
+## Rebalancing
 Triggered when:
 - Adding/removing shards
 - Skew detection
@@ -114,7 +114,7 @@ Triggered when:
 - Temporary performance drop
 Modern DBs rebalance gradually.
 ---
-# Sharding + Replication
+## Sharding + Replication
 Sharding ≠ Replication
 
 | Concept     | Purpose      |
@@ -131,7 +131,7 @@ Used in:
 - MySQL
 - PostgreSQL
 ---
-# Cross-Shard Queries
+## Cross-Shard Queries
 Single-shard query:
 `SELECT * FROM users WHERE user_id = X`
 Cross-shard query:
@@ -150,7 +150,7 @@ Requires:
 - Data duplication
 - Analytics DB separate
 ---
-# Distributed Transactions
+## Distributed Transactions
 Across shards:
 - Require 2PC (Two-Phase Commit)
 - Slow
@@ -163,8 +163,9 @@ Systems:
 
 Interview Tip:  
 Avoid cross-shard transactions in design unless necessary.
+
 ---
-# CAP Theorem Context
+## CAP Theorem Context
 In distributed sharded systems:
 Must tolerate network partitions.
 Tradeoff between:
@@ -174,7 +175,7 @@ Most NoSQL systems favor:
 
 > Availability + Partition tolerance
 ---
-# Directory-Based Sharding
+## Directory-Based Sharding
 Instead of computing shard:
 Maintain lookup table:
 `user_id → shard_id`
@@ -185,7 +186,7 @@ Maintain lookup table:
 - Directory becomes bottleneck
 - Extra lookup cost
 ---
-# Geo-Sharding
+## Geo-Sharding
 Partition by region:
 `India users → India cluster US users → US cluster`
 Used for:
@@ -193,7 +194,7 @@ Used for:
 - Compliance (GDPR)
 - Low latency
 ---
-# Common Interview Questions
+## Common Interview Questions
 ### Q1: Why not vertical scaling?
 Hardware limit + cost + SPOF.
 ### Q2: What happens when a shard fills?
@@ -206,7 +207,7 @@ Require coordination → latency + complexity.
 Rebalancing + virtual nodes + caching.
 
 ---
-# Quick Comparison
+## Quick Comparison
 
 |Strategy|Uniform|Range Queries|Easy Scaling|
 |---|---|---|---|
@@ -215,7 +216,7 @@ Rebalancing + virtual nodes + caching.
 |Consistent Hash|✅|❌|✅|
 
 ---
-# Practical Design Heuristics
+## Practical Design Heuristics
 - Shard by access pattern, not by intuition.
 - Keep related data in same shard.
 - Avoid cross-shard transactions.
