@@ -55,6 +55,34 @@
             "state": {
               "type": "markdown",
               "state": {
+                "file": "docs/Fundamentals/Scaling Databases.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Scaling Databases"
+            }
+          },
+          {
+            "id": "967b185e99b52816",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "docs/Fundamentals/Sharding & Partitioning.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Sharding & Partitioning"
+            }
+          },
+          {
+            "id": "cfb971bda5592f76",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
                 "file": "docs/index.md",
                 "mode": "source",
                 "source": false
@@ -64,7 +92,7 @@
             }
           }
         ],
-        "currentTab": 3
+        "currentTab": 5
       }
     ],
     "direction": "vertical"
@@ -215,15 +243,24 @@
       "obsidian-to-anki-plugin:Obsidian_to_Anki - Scan Vault": false
     }
   },
-  "active": "56a387726769031a",
+  "active": "cfb971bda5592f76",
   "lastOpenFiles": [
-    "docs/Fundamentals/Scaling Databases.md",
+    "docs/Fundamentals/Sharding & Partitioning.md",
     "docs/index.md",
-    "Fundamentals/Scalability Patterns.md",
+    "docs/Fundamentals/Scaling Databases.md",
+    "Fundamentals/Sharding.md",
     "Fundamentals",
-    "docs/Fundamentals/Relational Database.md",
+    "Fundamentals/Scalability Patterns.md",
+    "docs/Fundamentals/CAP Theorem.md",
     "docs/Fundamentals/Database Isolation Levels.md",
+    "docs/Fundamentals/Non Relational Databases.md",
+    "docs/Fundamentals/Relational Database.md",
+    "docs/Diagrams/Non_Relational_Databases.png",
+    "docs/Diagrams/Unconfirmed 772084.crdownload",
+    "docs/Diagrams/Sharding_and_Partitioning.png",
+    "docs/Diagrams/Unconfirmed 521952.crdownload",
     "docs/CaseStudies/URL Shortener.md",
+    "docs/Diagrams/url_shortener.png",
     "[].md",
     "docs/Diagrams/Scaling_Datbase_AB.png",
     "docs/Diagrams/Unconfirmed 597381.crdownload",
@@ -234,22 +271,16 @@
     "docs/Diagrams/DataBase_isolation_level_page-0001.jpg",
     "docs/Diagrams/DataBase_isolation_level_page-0002.jpg",
     "docs/Diagrams/DataBase_isolation_level.pdf",
-    "docs/Fundamentals/CAP Theorem.md",
     "README.md",
     "docs/Fundamentals",
     "Fundamentals/Relational Database.md",
     "Fundamentals/CAP Theorem.md",
     "docs/Diagrams/url_shortner.drawio",
     "docs/Diagrams/Unconfirmed 371595.crdownload",
-    "site/404.html",
-    "site/assets/javascripts/lunr/min/lunr.hi.min.js",
     "site/Diagrams/url_shortner.drawio.svg",
-    "docs/Diagrams/url_shortener.png",
     "Diagrams.md",
     "docs/Diagrams/url_shortner.drawio.svg",
     "docs/Diagrams/url_shortener.excalidraw.md",
-    "site/assets/images/favicon.png",
-    "site/Diagrams/url_shortener.png",
     "docs/README.md",
     "SystemDesignVault/README.md",
     "SystemDesignVault/Index.md",
@@ -259,9 +290,6 @@
     "CaseStudies/URL Shortener.md",
     "Diagrams/url_shortener.excalidraw.md",
     "Index.md",
-    "create a link.md",
-    "Welcome.md",
-    "Excalidraw/Untitled-2025-10-23-2335.excalidraw.md",
-    "Excalidraw/Drawing 2025-10-26 00.21.36.excalidraw.md"
+    "create a link.md"
   ]
 }

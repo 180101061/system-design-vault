@@ -41,6 +41,8 @@ nav:
       - Database Isolation Level: Fundamentals/Database Isolation Levels.md
       - Scaling Databases: Fundamentals/Scaling Databases.md
       - Scalability Patterns: Fundamentals/Scalability Patterns.md
+      - Sharding & Partitioning: Fundamentals/Sharding & Partitioning.md
+      - Non Relational Databases: Fundamentals/Non Relational Databases.md
   - Case Studies:
       - URL Shortener: CaseStudies/URL Shortener.md
       - Load Balancer: CaseStudies/Load Balancer.md

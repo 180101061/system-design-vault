@@ -14,6 +14,8 @@ Core concepts every system designer must know.
 - [Database Isolation Levels ](Fundamentals/Database%20Isolation%20Levels.md)
 - [Scaling Databases](Fundamentals/Scaling%20Databases.md)
 - [Scalability Patterns](Fundamentals/Scalability%20Patterns.md)
+- [Non Relational Database](Fundamentals/Non%20Relational%20Databases.md)
+- [Sharding & Partitioning](Fundamentals/Sharding%20&%20Partitioning.md)
 
 ---
 
