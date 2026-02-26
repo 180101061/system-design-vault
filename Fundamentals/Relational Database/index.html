@@ -1,0 +1,1837 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Visual notes and system design explanations with diagrams">
+      
+      
+      
+        <link rel="canonical" href="https://180101061.github.io/system-design-vault/Fundamentals/Relational%20Database/">
+      
+      
+        <link rel="prev" href="../CAP%20Theorem/">
+      
+      
+        <link rel="next" href="../Database%20Isolation%20Levels/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+    
+    
+      
+        <title>Relational Database - System Design Vault</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1-what-is-data" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="System Design Vault" class="md-header__button md-logo" aria-label="System Design Vault" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            System Design Vault
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Relational Database
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/180101061/system-design-vault" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    180101061/system-design-vault
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../CAP%20Theorem/" class="md-tabs__link">
+          
+  
+  
+  Fundamentals
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../CaseStudies/URL%20Shortener/" class="md-tabs__link">
+          
+  
+  
+  Case Studies
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../Diagrams/url_shortener.png" class="md-tabs__link">
+          
+  
+  
+  Diagrams
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="System Design Vault" class="md-nav__button md-logo" aria-label="System Design Vault" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    System Design Vault
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/180101061/system-design-vault" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    180101061/system-design-vault
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fundamentals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Fundamentals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CAP%20Theorem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CAP Theorem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Relational Database
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Relational Database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-is-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What is Data?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-what-is-a-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. What is a Database?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-how-is-data-stored-in-relational-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. How is Data Stored in Relational Databases?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-what-is-a-relational-database-rdbms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. What is a Relational Database (RDBMS)?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-key-properties-of-relational-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Key Properties of Relational Databases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Key Properties of Relational Databases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-data-consistency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Data Consistency
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-data-durability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Data Durability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-data-integrity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Data Integrity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 Constraints
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-everything-in-one-place-centralized-source-of-truth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 Everything in One Place (Centralized Source of Truth)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-why-do-relational-databases-support-transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Why Do Relational Databases Support Transactions?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-acid-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. ACID Properties
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. ACID Properties">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-atomicity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Atomicity
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7.1 Atomicity">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#possible-outcomes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Possible Outcomes:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-consistency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 Consistency
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-isolation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 Isolation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7.3 Isolation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-isolation-is-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Isolation Is Needed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-durability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.4 Durability
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7.4 Durability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-databases-achieve-durability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How Databases Achieve Durability
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-when-to-choose-a-relational-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. When to Choose a Relational Database?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-popular-relational-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Popular Relational Databases
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#-" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ---
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Database%20Isolation%20Levels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Isolation Level
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Scaling%20Databases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling Databases
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Scalability%20Patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scalability Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Sharding%20%26%20Partitioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sharding & Partitioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Non%20Relational%20Databases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non Relational Databases
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Case Studies
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Case Studies
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CaseStudies/URL%20Shortener/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    URL Shortener
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CaseStudies/Load Balancer.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Load Balancer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diagrams
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Diagrams
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Diagrams/url_shortener.png" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    URL Shortener
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-is-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What is Data?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-what-is-a-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. What is a Database?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-how-is-data-stored-in-relational-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. How is Data Stored in Relational Databases?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-what-is-a-relational-database-rdbms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. What is a Relational Database (RDBMS)?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-key-properties-of-relational-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Key Properties of Relational Databases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Key Properties of Relational Databases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-data-consistency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Data Consistency
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-data-durability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Data Durability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-data-integrity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Data Integrity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 Constraints
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-everything-in-one-place-centralized-source-of-truth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 Everything in One Place (Centralized Source of Truth)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-why-do-relational-databases-support-transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Why Do Relational Databases Support Transactions?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-acid-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. ACID Properties
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. ACID Properties">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-atomicity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Atomicity
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7.1 Atomicity">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#possible-outcomes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Possible Outcomes:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-consistency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 Consistency
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-isolation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 Isolation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7.3 Isolation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-isolation-is-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Isolation Is Needed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-durability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.4 Durability
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7.4 Durability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-databases-achieve-durability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How Databases Achieve Durability
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-when-to-choose-a-relational-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. When to Choose a Relational Database?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-popular-relational-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Popular Relational Databases
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#-" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ---
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Relational Database</h1>
+
+<h2 id="1-what-is-data">1. What is Data?<a class="headerlink" href="#1-what-is-data" title="Permanent link">&para;</a></h2>
+<p><strong>Data</strong> is raw information that represents facts, observations, or measurements.
+<strong>Examples:</strong></p>
+<ul>
+<li>A name: <code>Ram</code></li>
+<li>A number: <code>25</code></li>
+<li>A date: <code>2026-01-10</code></li>
+<li>A status: <code>DONE</code></li>
+</ul>
+<p>By itself, data has limited value. Its real value comes when it is <strong>stored, structured, and queried</strong> efficiently.</p>
+<hr />
+<h2 id="2-what-is-a-database">2. What is a Database?<a class="headerlink" href="#2-what-is-a-database" title="Permanent link">&para;</a></h2>
+<p>A <strong>database</strong> is an organized collection of data that allows:</p>
+<ul>
+<li>Storing data permanently</li>
+<li>Reading data efficiently</li>
+<li>Updating data safely</li>
+<li>Deleting data when required
+Instead of storing data in files (like text files or Excel), databases provide:</li>
+<li>Faster access</li>
+<li>Data safety</li>
+<li>Concurrency (multiple users at the same time)</li>
+<li>Reliability</li>
+</ul>
+<hr />
+<h2 id="3-how-is-data-stored-in-relational-databases">3. How is Data Stored in Relational Databases?<a class="headerlink" href="#3-how-is-data-stored-in-relational-databases" title="Permanent link">&para;</a></h2>
+<p>In a <strong>Relational Database</strong>, data is stored in <strong>tables</strong>.</p>
+<p><strong>Table Structure</strong></p>
+<ul>
+<li><strong>Rows</strong> → Individual records</li>
+<li><strong>Columns</strong> → Attributes (fields)</li>
+</ul>
+<p><strong>Example: <code>Users</code> Table</strong></p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>email</th>
+<th>age</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Ram</td>
+<td><a href="mailto:ram@gmail.com">ram@gmail.com</a></td>
+<td>25</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Amit</td>
+<td><a href="mailto:amit@gmail.com">amit@gmail.com</a></td>
+<td>28</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Each <strong>row</strong> represents one user</li>
+<li>Each <strong>column</strong> represents a property of the user</li>
+</ul>
+<hr />
+<h2 id="4-what-is-a-relational-database-rdbms">4. What is a Relational Database (RDBMS)?<a class="headerlink" href="#4-what-is-a-relational-database-rdbms" title="Permanent link">&para;</a></h2>
+<p>A <strong>Relational Database</strong> is a database that:</p>
+<ul>
+<li>Stores data in tables</li>
+<li>Establishes <strong>relationships</strong> between tables</li>
+<li>Uses <strong>keys</strong> (Primary Key, Foreign Key) to maintain these relationships</li>
+</ul>
+<p><strong>Example of Relationship</strong></p>
+<p><strong>Orders Table</strong></p>
+<table>
+<thead>
+<tr>
+<th>order_id</th>
+<th>user_id</th>
+<th>amount</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>101</td>
+<td>1</td>
+<td>500</td>
+</tr>
+<tr>
+<td>102</td>
+<td>2</td>
+<td>300</td>
+</tr>
+</tbody>
+</table>
+<p>Here:
+- <code>user_id</code> refers to <code>Users.id</code>
+- This creates a <strong>relationship</strong> between Users and Orders</p>
+<hr />
+<h2 id="5-key-properties-of-relational-databases">5. Key Properties of Relational Databases<a class="headerlink" href="#5-key-properties-of-relational-databases" title="Permanent link">&para;</a></h2>
+<h3 id="51-data-consistency">5.1 Data Consistency<a class="headerlink" href="#51-data-consistency" title="Permanent link">&para;</a></h3>
+<p>Data remains <strong>correct and reliable</strong> across the database.</p>
+<p>Example:</p>
+<ul>
+<li>If a user balance is <code>₹1000</code>, it should not show <code>₹800</code> in another query unless updated properly.</li>
+</ul>
+<hr />
+<h3 id="52-data-durability">5.2 Data Durability<a class="headerlink" href="#52-data-durability" title="Permanent link">&para;</a></h3>
+<p>Once data is committed, it <strong>will not be lost</strong>, even if:</p>
+<ul>
+<li>The system crashes</li>
+<li>Power goes off</li>
+</ul>
+<p>Databases achieve this using:</p>
+<ul>
+<li>Write‑Ahead Logs (WAL)</li>
+<li>Disk persistence</li>
+</ul>
+<hr />
+<h3 id="53-data-integrity">5.3 Data Integrity<a class="headerlink" href="#53-data-integrity" title="Permanent link">&para;</a></h3>
+<p>Ensures data is <strong>accurate and valid</strong>.</p>
+<p>Types of integrity:</p>
+<ul>
+<li><strong>Entity Integrity</strong> – Primary key cannot be NULL</li>
+<li><strong>Referential Integrity</strong> – Foreign key must refer to existing data</li>
+<li><strong>Domain Integrity</strong> – Data must follow rules (age &gt; 0)</li>
+</ul>
+<hr />
+<h3 id="54-constraints">5.4 Constraints<a class="headerlink" href="#54-constraints" title="Permanent link">&para;</a></h3>
+<p>Constraints are <strong>rules enforced by the database</strong>.</p>
+<p>Common constraints:</p>
+<ul>
+<li><code>PRIMARY KEY</code></li>
+<li><code>FOREIGN KEY</code></li>
+<li><code>UNIQUE</code></li>
+<li><code>NOT NULL</code></li>
+<li><code>CHECK</code></li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">age</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">CHECK</span><span class="w"> </span><span class="p">(</span><span class="n">age</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">18</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h3 id="55-everything-in-one-place-centralized-source-of-truth">5.5 Everything in One Place (Centralized Source of Truth)<a class="headerlink" href="#55-everything-in-one-place-centralized-source-of-truth" title="Permanent link">&para;</a></h3>
+<ul>
+<li>All data lives in a single system</li>
+<li>Prevents duplication</li>
+<li>Avoids conflicts between multiple data copies</li>
+</ul>
+<p>This makes RDBMS ideal for <strong>enterprise systems</strong>.</p>
+<hr />
+<h2 id="6-why-do-relational-databases-support-transactions">6. Why Do Relational Databases Support Transactions?<a class="headerlink" href="#6-why-do-relational-databases-support-transactions" title="Permanent link">&para;</a></h2>
+<p>Because of the above properties, RDBMS supports <strong>transactions</strong>.</p>
+<p>A <strong>transaction</strong> is a group of operations that must execute <strong>completely or not at all</strong>.</p>
+<p>Example:</p>
+<ul>
+<li>Deduct money from Account A</li>
+<li>Add money to Account B</li>
+</ul>
+<p>Both must succeed, or both must fail.</p>
+<hr />
+<h2 id="7-acid-properties">7. ACID Properties<a class="headerlink" href="#7-acid-properties" title="Permanent link">&para;</a></h2>
+<p>ACID guarantees <strong>safe and reliable transactions</strong>.
+ACID = <strong>Atomicity, Consistency, Isolation, Durability</strong></p>
+<p>A <strong>transaction</strong> is a logical unit of work that contains one or more database operations.
+Example:
+<code>Transfer ₹100 from Account A to Account B</code>
+This involves multiple steps but must behave as <strong>one unit</strong>.</p>
+<h3 id="71-atomicity">7.1 Atomicity<a class="headerlink" href="#71-atomicity" title="Permanent link">&para;</a></h3>
+<ul>
+<li>All operations succeed or none do - <em>All or Nothing</em></li>
+</ul>
+<p><strong>Example:</strong>
+Steps in a transaction:
+1. Deduct ₹100 from Account A
+2. Add ₹100 to Account B</p>
+<h4 id="possible-outcomes">Possible Outcomes:<a class="headerlink" href="#possible-outcomes" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Both steps succeed → ✅ Transaction committed</li>
+<li>Any step fails → ❌ Entire transaction rolled back</li>
+</ul>
+<p>❌ <strong>Not allowed</strong>:</p>
+<ul>
+<li>Money deducted from A but not added to B</li>
+</ul>
+<p><strong>How Databases Achieve Atomicity</strong>
+- Use <strong>undo logs / rollback logs</strong>
+- If a failure occurs, changes are reverted to the previous state</p>
+<p><strong>Real-World Analogy</strong>
+Think of an <strong>ATM transaction</strong>:
+- Either you get cash <strong>and</strong> your balance is reduced
+- Or you get nothing and your balance remains unchanged</p>
+<hr />
+<h3 id="72-consistency">7.2 Consistency<a class="headerlink" href="#72-consistency" title="Permanent link">&para;</a></h3>
+<p>Always Valid State
+<strong>Consistency ensures that a transaction takes the database from one valid state to another valid state</strong>, following all rules and constraints.
+<strong>What “Rules” Mean</strong>
+Rules include:
+- Primary keys
+- Foreign keys
+- Unique constraints
+- Check constraints
+- Business rules
+<strong>Example:</strong>
+Constraint:
+<code>balance &gt;= 0</code>
+Transaction:
+<code>Withdraw ₹500 from account with ₹300</code>
+❌ Result:
+- Balance becomes <code>-200</code> → violates constraint</p>
+<p>➡️ <strong>Transaction is rejected</strong><br />
+➡️ Database remains consistent
+<strong>Important Clarification</strong>
+- Consistency is <strong>not about concurrency</strong>
+- It is about <strong>data correctness</strong></p>
+<p><strong>Real-World Analogy</strong>
+A form submission:
+- Age field must be a number
+- Email must be valid
+If rules fail → submission rejected
+- Database moves from one valid state to another
+- Constraints are always respected</p>
+<hr />
+<h3 id="73-isolation">7.3 Isolation<a class="headerlink" href="#73-isolation" title="Permanent link">&para;</a></h3>
+<p>Transactions Don’t Interfere
+<strong>Isolation ensures that multiple transactions running at the same time do not affect each other’s intermediate states.</strong></p>
+<p>Each transaction behaves <strong>as if it is the only one running</strong>.</p>
+<h4 id="why-isolation-is-needed">Why Isolation Is Needed<a class="headerlink" href="#why-isolation-is-needed" title="Permanent link">&para;</a></h4>
+<p>In real systems:
+- Thousands of users
+- Many transactions running concurrently
+Without isolation → <strong>data corruption</strong></p>
+<p><strong>Example:</strong>
+Initial balance: ₹1000
+Two transactions run at the same time:
+- <strong>T1</strong>: Withdraw ₹300
+- <strong>T2</strong>: Withdraw ₹500
+❌ Without isolation:
+- Both read balance as ₹1000
+- Final balance becomes wrong
+✅ With isolation:
+- Transactions are properly ordered or controlled
+- Final balance is correct
+<strong>Isolation Problems It Prevents</strong>
+- <strong>Dirty Reads</strong> – reading uncommitted data
+- <strong>Non-repeatable Reads</strong>
+- <strong>Phantom Reads</strong></p>
+<p><strong>Isolation Levels (Brief)</strong>
+- Read Uncommitted
+- Read Committed
+- Repeatable Read
+- Serializable (strongest)</p>
+<p>Higher isolation = more safety, less concurrency</p>
+<p><strong>Real-World Analogy</strong>
+Two people editing the same Google Doc:
+- Changes are managed so work doesn’t conflict incorrectly</p>
+<hr />
+<h3 id="74-durability">7.4 Durability<a class="headerlink" href="#74-durability" title="Permanent link">&para;</a></h3>
+<p>Once Committed, Never Lost
+Durability guarantees that once a transaction is committed, its changes will survive system crashes, power failures, or restarts.</p>
+<p><strong>Example:</strong>
+- Transaction committed
+- Server crashes immediately after
+✅ After restart:
+- Data is still present</p>
+<h4 id="how-databases-achieve-durability">How Databases Achieve Durability<a class="headerlink" href="#how-databases-achieve-durability" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Write-Ahead Logging (WAL)</li>
+<li>Persistent storage (disk, SSD)</li>
+<li>Replication</li>
+</ul>
+<p><strong>Important Point</strong>
+Durability applies <strong>only after COMMIT</strong>.
+Before commit:
+- Data can be lost<br />
+After commit:
+- Data must persist</p>
+<p><strong>Real-World Analogy</strong>
+Once you receive a payment confirmation, the transaction is recorded permanently—even if the app crashes afterward.</p>
+<hr />
+<h2 id="8-when-to-choose-a-relational-database">8. When to Choose a Relational Database?<a class="headerlink" href="#8-when-to-choose-a-relational-database" title="Permanent link">&para;</a></h2>
+<p>Pick an RDBMS when:</p>
+<ul>
+<li>Data has <strong>clear relationships</strong></li>
+<li>You need <strong>ACID transactions</strong></li>
+<li>Data correctness is critical</li>
+<li>
+<p>Strong consistency is required
+<strong>Common Use Cases</strong></p>
+</li>
+<li>
+<p>Banking systems</p>
+</li>
+<li>Order management systems</li>
+<li>Inventory systems</li>
+<li>Enterprise applications</li>
+</ul>
+<hr />
+<h2 id="9-popular-relational-databases">9. Popular Relational Databases<a class="headerlink" href="#9-popular-relational-databases" title="Permanent link">&para;</a></h2>
+<ul>
+<li>MySQL</li>
+<li>PostgreSQL</li>
+<li>Oracle</li>
+<li>SQL Server</li>
+</ul>
+<hr />
+<h2 id="10-summary">10. Summary<a class="headerlink" href="#10-summary" title="Permanent link">&para;</a></h2>
+<p>Relational Databases:
+- Store data in tables
+- Maintain relationships
+- Enforce constraints and integrity
+- Support transactions using ACID</p>
+<p>They are best suited for systems where <strong>data correctness, reliability, and consistency</strong> matter more than flexibility.</p>
+<h2 id="-">---<a class="headerlink" href="#-" title="Permanent link">&para;</a></h2>
+<p>End of Notes</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tabs", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

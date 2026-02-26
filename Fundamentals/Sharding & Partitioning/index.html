@@ -1,0 +1,2436 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Visual notes and system design explanations with diagrams">
+      
+      
+      
+        <link rel="canonical" href="https://180101061.github.io/system-design-vault/Fundamentals/Sharding%20%26%20Partitioning/">
+      
+      
+        <link rel="prev" href="../Scalability%20Patterns/">
+      
+      
+        <link rel="next" href="../Non%20Relational%20Databases/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+    
+    
+      
+        <title>Sharding & Partitioning - System Design Vault</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#core-definitions" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="System Design Vault" class="md-header__button md-logo" aria-label="System Design Vault" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            System Design Vault
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Sharding & Partitioning
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/180101061/system-design-vault" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    180101061/system-design-vault
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../CAP%20Theorem/" class="md-tabs__link">
+          
+  
+  
+  Fundamentals
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../CaseStudies/URL%20Shortener/" class="md-tabs__link">
+          
+  
+  
+  Case Studies
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../Diagrams/url_shortener.png" class="md-tabs__link">
+          
+  
+  
+  Diagrams
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="System Design Vault" class="md-nav__button md-logo" aria-label="System Design Vault" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    System Design Vault
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/180101061/system-design-vault" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    180101061/system-design-vault
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fundamentals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Fundamentals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CAP%20Theorem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CAP Theorem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Relational%20Database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Relational Database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Database%20Isolation%20Levels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Isolation Level
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Scaling%20Databases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling Databases
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Scalability%20Patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scalability Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sharding & Partitioning
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sharding & Partitioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#core-definitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Definitions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Definitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#partitioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Partitioning
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Sharding?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Why Sharding?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#problems-without-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problems Without Sharding
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goals
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#types-of-partitioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Types of Partitioning
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Types of Partitioning">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-vertical-partitioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A) Vertical Partitioning
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-horizontal-partitioning-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B) Horizontal Partitioning (Sharding)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sharding-strategies-very-important" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sharding Strategies (Very Important)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sharding Strategies (Very Important)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-range-based-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Range-Based Sharding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 Range-Based Sharding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-hash-based-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Hash-Based Sharding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.2 Hash-Based Sharding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pros_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-consistent-hashing-high-value-topic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Consistent Hashing (High-Value Topic)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.3 Consistent Hashing (High-Value Topic)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-idea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Idea
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-advantage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Advantage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Line
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consistent-hashing-minimizes-key-redistribution-during-cluster-scaling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        &gt; Consistent hashing minimizes key redistribution during cluster scaling.
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shard-key-selection-extremely-important" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shard Key Selection (Extremely Important)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Shard Key Selection (Extremely Important)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#good-shard-key-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Good Shard Key Properties
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bad-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bad Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#good-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Good Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hotspot-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hotspot Problem
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Hotspot Problem">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#solutions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Solutions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rebalancing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rebalancing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Rebalancing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#problems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problems
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sharding-replication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sharding + Replication
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cross-shard-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cross-Shard Queries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cross-Shard Queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#problems_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problems
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solutions_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Solutions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#distributed-transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distributed Transactions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cap-theorem-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAP Theorem Context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#availability-partition-tolerance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        &gt; Availability + Partition tolerance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#directory-based-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Directory-Based Sharding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Directory-Based Sharding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pros_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#geo-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Geo-Sharding
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-interview-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Interview Questions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Interview Questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#q1-why-not-vertical-scaling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Q1: Why not vertical scaling?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#q2-what-happens-when-a-shard-fills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Q2: What happens when a shard fills?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#q3-can-we-change-shard-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Q3: Can we change shard key?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#q4-why-avoid-cross-shard-joins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Q4: Why avoid cross-shard joins?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#q5-how-do-you-handle-uneven-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Q5: How do you handle uneven traffic?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Comparison
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#practical-design-heuristics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Practical Design Heuristics
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Non%20Relational%20Databases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non Relational Databases
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Case Studies
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Case Studies
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CaseStudies/URL%20Shortener/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    URL Shortener
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CaseStudies/Load Balancer.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Load Balancer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diagrams
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Diagrams
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Diagrams/url_shortener.png" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    URL Shortener
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#core-definitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Definitions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Definitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#partitioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Partitioning
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Sharding?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Why Sharding?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#problems-without-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problems Without Sharding
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goals
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#types-of-partitioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Types of Partitioning
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Types of Partitioning">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-vertical-partitioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A) Vertical Partitioning
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-horizontal-partitioning-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B) Horizontal Partitioning (Sharding)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sharding-strategies-very-important" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sharding Strategies (Very Important)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sharding Strategies (Very Important)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-range-based-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Range-Based Sharding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 Range-Based Sharding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-hash-based-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Hash-Based Sharding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.2 Hash-Based Sharding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pros_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-consistent-hashing-high-value-topic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Consistent Hashing (High-Value Topic)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.3 Consistent Hashing (High-Value Topic)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-idea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Idea
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-advantage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Advantage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interview-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interview Line
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consistent-hashing-minimizes-key-redistribution-during-cluster-scaling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        &gt; Consistent hashing minimizes key redistribution during cluster scaling.
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shard-key-selection-extremely-important" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shard Key Selection (Extremely Important)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Shard Key Selection (Extremely Important)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#good-shard-key-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Good Shard Key Properties
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bad-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bad Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#good-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Good Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hotspot-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hotspot Problem
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Hotspot Problem">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#solutions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Solutions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rebalancing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rebalancing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Rebalancing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#problems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problems
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sharding-replication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sharding + Replication
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cross-shard-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cross-Shard Queries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cross-Shard Queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#problems_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problems
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solutions_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Solutions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#distributed-transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distributed Transactions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cap-theorem-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAP Theorem Context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#availability-partition-tolerance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        &gt; Availability + Partition tolerance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#directory-based-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Directory-Based Sharding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Directory-Based Sharding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pros_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cons
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#geo-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Geo-Sharding
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-interview-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Interview Questions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Interview Questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#q1-why-not-vertical-scaling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Q1: Why not vertical scaling?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#q2-what-happens-when-a-shard-fills" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Q2: What happens when a shard fills?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#q3-can-we-change-shard-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Q3: Can we change shard key?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#q4-why-avoid-cross-shard-joins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Q4: Why avoid cross-shard joins?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#q5-how-do-you-handle-uneven-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Q5: How do you handle uneven traffic?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Comparison
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#practical-design-heuristics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Practical Design Heuristics
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Sharding & Partitioning</h1>
+
+<p><img alt="Sharding and Partitioning" src="../../Diagrams/Sharding_and_Partitioning.png" /></p>
+<h2 id="core-definitions">Core Definitions<a class="headerlink" href="#core-definitions" title="Permanent link">&para;</a></h2>
+<h3 id="partitioning">Partitioning<a class="headerlink" href="#partitioning" title="Permanent link">&para;</a></h3>
+<p>Dividing a dataset into smaller logical pieces.
+- <strong>Vertical partitioning</strong> → Split by columns
+- <strong>Horizontal partitioning</strong> → Split by rows</p>
+<blockquote>
+<p>Sharding = horizontal partitioning across multiple machines.</p>
+</blockquote>
+<hr />
+<h2 id="why-sharding">Why Sharding?<a class="headerlink" href="#why-sharding" title="Permanent link">&para;</a></h2>
+<h3 id="problems-without-sharding">Problems Without Sharding<a class="headerlink" href="#problems-without-sharding" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Vertical scaling limit (CPU, RAM, Disk)</li>
+<li>Single point of failure</li>
+<li>Write throughput bottleneck</li>
+<li>Large index degradation</li>
+</ul>
+<h3 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Horizontal scalability</li>
+<li>Higher write throughput</li>
+<li>Fault isolation</li>
+<li>Reduced index size per node</li>
+</ul>
+<hr />
+<h2 id="types-of-partitioning">Types of Partitioning<a class="headerlink" href="#types-of-partitioning" title="Permanent link">&para;</a></h2>
+<h3 id="a-vertical-partitioning">A) Vertical Partitioning<a class="headerlink" href="#a-vertical-partitioning" title="Permanent link">&para;</a></h3>
+<p>Split by columns.
+Example:<br />
+User table:
+<code>(id, name, email) → Table A (profile_pic, bio) → Table B</code>
+Used for:
+- Reducing I/O
+- Separating hot vs cold data</p>
+<hr />
+<h3 id="b-horizontal-partitioning-sharding">B) Horizontal Partitioning (Sharding)<a class="headerlink" href="#b-horizontal-partitioning-sharding" title="Permanent link">&para;</a></h3>
+<p>Split rows across shards:
+<code>Shard 1 → user_id 1–1M Shard 2 → user_id 1M–2M</code></p>
+<hr />
+<h2 id="sharding-strategies-very-important">Sharding Strategies (Very Important)<a class="headerlink" href="#sharding-strategies-very-important" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="41-range-based-sharding">4.1 Range-Based Sharding<a class="headerlink" href="#41-range-based-sharding" title="Permanent link">&para;</a></h3>
+<p>Partition by value range.
+Example:
+<code>0–1000 → Shard 1 1001–2000 → Shard 2</code></p>
+<h4 id="pros">Pros<a class="headerlink" href="#pros" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Efficient range queries</li>
+<li>Simple routing</li>
+</ul>
+<h4 id="cons">Cons<a class="headerlink" href="#cons" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Hotspot risk</li>
+<li>Uneven distribution</li>
+<li>Difficult resharding</li>
+</ul>
+<hr />
+<h3 id="42-hash-based-sharding">4.2 Hash-Based Sharding<a class="headerlink" href="#42-hash-based-sharding" title="Permanent link">&para;</a></h3>
+<p><code>shard_id = hash(key) % N</code></p>
+<h4 id="pros_1">Pros<a class="headerlink" href="#pros_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Uniform distribution</li>
+<li>Avoids skew (generally)</li>
+</ul>
+<h4 id="cons_1">Cons<a class="headerlink" href="#cons_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Poor for range queries</li>
+<li>Adding shard → full rehash</li>
+</ul>
+<hr />
+<h3 id="43-consistent-hashing-high-value-topic">4.3 Consistent Hashing (High-Value Topic)<a class="headerlink" href="#43-consistent-hashing-high-value-topic" title="Permanent link">&para;</a></h3>
+<p>Used in:
+- Apache Cassandra
+- Amazon DynamoDB
+- Redis Cluster</p>
+<h4 id="core-idea">Core Idea<a class="headerlink" href="#core-idea" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Map nodes + keys on hash ring</li>
+<li>Key assigned to next clockwise node</li>
+</ul>
+<h4 id="key-advantage">Key Advantage<a class="headerlink" href="#key-advantage" title="Permanent link">&para;</a></h4>
+<p>When adding/removing node:
+- Only small portion of keys move
+- No global rehash</p>
+<h4 id="interview-line">Interview Line<a class="headerlink" href="#interview-line" title="Permanent link">&para;</a></h4>
+<h2 id="consistent-hashing-minimizes-key-redistribution-during-cluster-scaling">&gt; Consistent hashing minimizes key redistribution during cluster scaling.<a class="headerlink" href="#consistent-hashing-minimizes-key-redistribution-during-cluster-scaling" title="Permanent link">&para;</a></h2>
+<h2 id="shard-key-selection-extremely-important">Shard Key Selection (Extremely Important)<a class="headerlink" href="#shard-key-selection-extremely-important" title="Permanent link">&para;</a></h2>
+<p>Bad shard key = production disaster.</p>
+<h3 id="good-shard-key-properties">Good Shard Key Properties<a class="headerlink" href="#good-shard-key-properties" title="Permanent link">&para;</a></h3>
+<ul>
+<li>High cardinality</li>
+<li>Uniform distribution</li>
+<li>Frequently used in queries</li>
+<li>Immutable</li>
+<li>Avoid monotonic growth</li>
+</ul>
+<h3 id="bad-examples">Bad Examples<a class="headerlink" href="#bad-examples" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>country</code> → low cardinality</li>
+<li><code>created_at</code> → hotspot on latest shard</li>
+<li>Boolean fields</li>
+</ul>
+<h3 id="good-examples">Good Examples<a class="headerlink" href="#good-examples" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>user_id</code></li>
+<li><code>order_id</code></li>
+<li>UUID</li>
+</ul>
+<hr />
+<h2 id="hotspot-problem">Hotspot Problem<a class="headerlink" href="#hotspot-problem" title="Permanent link">&para;</a></h2>
+<p>Even with hashing:
+- Celebrity accounts
+- Trending content
+- Write-heavy users</p>
+<h3 id="solutions">Solutions<a class="headerlink" href="#solutions" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Key salting</li>
+<li>Logical partitioning</li>
+<li>Caching (e.g., Redis)</li>
+<li>Write spreading</li>
+<li>Rate limiting</li>
+</ul>
+<hr />
+<h2 id="rebalancing">Rebalancing<a class="headerlink" href="#rebalancing" title="Permanent link">&para;</a></h2>
+<p>Triggered when:
+- Adding/removing shards
+- Skew detection
+- Storage threshold exceeded</p>
+<h3 id="problems">Problems<a class="headerlink" href="#problems" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Data migration cost</li>
+<li>Network congestion</li>
+<li>Replica lag</li>
+<li>Temporary performance drop
+Modern DBs rebalance gradually.</li>
+</ul>
+<hr />
+<h2 id="sharding-replication">Sharding + Replication<a class="headerlink" href="#sharding-replication" title="Permanent link">&para;</a></h2>
+<p>Sharding ≠ Replication</p>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sharding</td>
+<td>Scale</td>
+</tr>
+<tr>
+<td>Replication</td>
+<td>Availability</td>
+</tr>
+</tbody>
+</table>
+<p>Example:<br />
+Each shard has:
+- 1 Primary
+- 2 Replicas
+Used in:
+- MongoDB
+- MySQL
+- PostgreSQL</p>
+<hr />
+<h2 id="cross-shard-queries">Cross-Shard Queries<a class="headerlink" href="#cross-shard-queries" title="Permanent link">&para;</a></h2>
+<p>Single-shard query:
+<code>SELECT * FROM users WHERE user_id = X</code>
+Cross-shard query:
+<code>SELECT * FROM orders WHERE amount &gt; 1000</code>
+Requires:
+- Scatter-gather
+- Merge results
+- Global sort</p>
+<h3 id="problems_1">Problems<a class="headerlink" href="#problems_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>High latency</li>
+<li>Expensive</li>
+<li>Hard to maintain strong consistency</li>
+</ul>
+<h3 id="solutions_1">Solutions<a class="headerlink" href="#solutions_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Denormalization</li>
+<li>Secondary indexes</li>
+<li>Data duplication</li>
+<li>Analytics DB separate</li>
+</ul>
+<hr />
+<h2 id="distributed-transactions">Distributed Transactions<a class="headerlink" href="#distributed-transactions" title="Permanent link">&para;</a></h2>
+<p>Across shards:
+- Require 2PC (Two-Phase Commit)
+- Slow
+- Complex
+- Reduce availability</p>
+<p>Systems:
+- Google Spanner → Strong consistency
+- Apache Cassandra → Tunable consistency</p>
+<p>Interview Tip:<br />
+Avoid cross-shard transactions in design unless necessary.</p>
+<hr />
+<h2 id="cap-theorem-context">CAP Theorem Context<a class="headerlink" href="#cap-theorem-context" title="Permanent link">&para;</a></h2>
+<p>In distributed sharded systems:
+Must tolerate network partitions.
+Tradeoff between:
+- Consistency
+- Availability
+Most NoSQL systems favor:</p>
+<h2 id="availability-partition-tolerance">&gt; Availability + Partition tolerance<a class="headerlink" href="#availability-partition-tolerance" title="Permanent link">&para;</a></h2>
+<h2 id="directory-based-sharding">Directory-Based Sharding<a class="headerlink" href="#directory-based-sharding" title="Permanent link">&para;</a></h2>
+<p>Instead of computing shard:
+Maintain lookup table:
+<code>user_id → shard_id</code></p>
+<h3 id="pros_2">Pros<a class="headerlink" href="#pros_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Flexible</li>
+<li>Easy resharding</li>
+</ul>
+<h3 id="cons_2">Cons<a class="headerlink" href="#cons_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Directory becomes bottleneck</li>
+<li>Extra lookup cost</li>
+</ul>
+<hr />
+<h2 id="geo-sharding">Geo-Sharding<a class="headerlink" href="#geo-sharding" title="Permanent link">&para;</a></h2>
+<p>Partition by region:
+<code>India users → India cluster US users → US cluster</code>
+Used for:
+- Data locality
+- Compliance (GDPR)
+- Low latency</p>
+<hr />
+<h2 id="common-interview-questions">Common Interview Questions<a class="headerlink" href="#common-interview-questions" title="Permanent link">&para;</a></h2>
+<h3 id="q1-why-not-vertical-scaling">Q1: Why not vertical scaling?<a class="headerlink" href="#q1-why-not-vertical-scaling" title="Permanent link">&para;</a></h3>
+<p>Hardware limit + cost + SPOF.</p>
+<h3 id="q2-what-happens-when-a-shard-fills">Q2: What happens when a shard fills?<a class="headerlink" href="#q2-what-happens-when-a-shard-fills" title="Permanent link">&para;</a></h3>
+<p>Resharding or data migration.</p>
+<h3 id="q3-can-we-change-shard-key">Q3: Can we change shard key?<a class="headerlink" href="#q3-can-we-change-shard-key" title="Permanent link">&para;</a></h3>
+<p>Yes, but extremely expensive migration.</p>
+<h3 id="q4-why-avoid-cross-shard-joins">Q4: Why avoid cross-shard joins?<a class="headerlink" href="#q4-why-avoid-cross-shard-joins" title="Permanent link">&para;</a></h3>
+<p>Require coordination → latency + complexity.</p>
+<h3 id="q5-how-do-you-handle-uneven-traffic">Q5: How do you handle uneven traffic?<a class="headerlink" href="#q5-how-do-you-handle-uneven-traffic" title="Permanent link">&para;</a></h3>
+<p>Rebalancing + virtual nodes + caching.</p>
+<hr />
+<h2 id="quick-comparison">Quick Comparison<a class="headerlink" href="#quick-comparison" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Uniform</th>
+<th>Range Queries</th>
+<th>Easy Scaling</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Range</td>
+<td>❌</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Hash</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Consistent Hash</td>
+<td>✅</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="practical-design-heuristics">Practical Design Heuristics<a class="headerlink" href="#practical-design-heuristics" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Shard by access pattern, not by intuition.</li>
+<li>Keep related data in same shard.</li>
+<li>Avoid cross-shard transactions.</li>
+<li>Replication factor ≥ 3.</li>
+<li>Monitor shard size &amp; QPS.</li>
+<li>Plan resharding from day 1.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tabs", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

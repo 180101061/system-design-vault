@@ -1,0 +1,2115 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Visual notes and system design explanations with diagrams">
+      
+      
+      
+        <link rel="canonical" href="https://180101061.github.io/system-design-vault/Fundamentals/Database%20Isolation%20Levels/">
+      
+      
+        <link rel="prev" href="../Relational%20Database/">
+      
+      
+        <link rel="next" href="../Scaling%20Databases/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+    
+    
+      
+        <title>Database Isolation Level - System Design Vault</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1-what-does-isolation-mean" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="System Design Vault" class="md-header__button md-logo" aria-label="System Design Vault" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            System Design Vault
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Database Isolation Level
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/180101061/system-design-vault" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    180101061/system-design-vault
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../CAP%20Theorem/" class="md-tabs__link">
+          
+  
+  
+  Fundamentals
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../CaseStudies/URL%20Shortener/" class="md-tabs__link">
+          
+  
+  
+  Case Studies
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../Diagrams/url_shortener.png" class="md-tabs__link">
+          
+  
+  
+  Diagrams
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="System Design Vault" class="md-nav__button md-logo" aria-label="System Design Vault" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    System Design Vault
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/180101061/system-design-vault" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    180101061/system-design-vault
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fundamentals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Fundamentals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CAP%20Theorem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CAP Theorem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Relational%20Database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Relational Database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Isolation Level
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Isolation Level
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-does-isolation-mean" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What Does “Isolation” Mean?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Transactions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-problems-that-happen-without-proper-isolation-anomalies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Problems That Happen Without Proper Isolation (Anomalies)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Problems That Happen Without Proper Isolation (Anomalies)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-dirty-read-reading-a-lie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Dirty Read (Reading a Lie)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1 Dirty Read (Reading a Lie)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-it-means" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it means
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-nonrepeatable-read-data-keeps-changing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Non‑Repeatable Read (Data Keeps Changing)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.2 Non‑Repeatable Read (Data Keeps Changing)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-it-means_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it means
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-phantom-read-new-rows-appear-like-ghosts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Phantom Read (New Rows Appear Like Ghosts)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.3 Phantom Read (New Rows Appear Like Ghosts)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-it-means_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it means
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-write-skew-very-important" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Write Skew (Very Important)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.4 Write Skew (Very Important)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-it-means_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it means
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-doctor-oncall-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example (Doctor On‑Call Rule)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-isolation-levels-big-picture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Isolation Levels (Big Picture)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-read-uncommitted-almost-never-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. READ UNCOMMITTED (Almost Never Used)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. READ UNCOMMITTED (Almost Never Used)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#idea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Idea
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-happens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What happens
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-read-committed-most-common" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. READ COMMITTED (Most Common)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. READ COMMITTED (Most Common)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#idea_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Idea
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mental-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mental Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-repeatable-read" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. REPEATABLE READ
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. REPEATABLE READ">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#idea_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Idea
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#but-phantom-reads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        But Phantom Reads?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-serializable-strongest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. SERIALIZABLE (Strongest)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. SERIALIZABLE (Strongest)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#idea_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Idea
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-dbs-actually-do-this" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How DBs Actually Do This
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-snapshot-isolation-reality-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Snapshot Isolation (Reality Check)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Snapshot Isolation (Reality Check)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-snapshot-means" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Snapshot Means
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problem
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-oneline-memory-trick" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. One‑Line Memory Trick
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-final-takeaway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Final Takeaway
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Scaling%20Databases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling Databases
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Scalability%20Patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scalability Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Sharding%20%26%20Partitioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sharding & Partitioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Non%20Relational%20Databases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non Relational Databases
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Case Studies
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Case Studies
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CaseStudies/URL%20Shortener/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    URL Shortener
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CaseStudies/Load Balancer.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Load Balancer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diagrams
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Diagrams
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Diagrams/url_shortener.png" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    URL Shortener
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-does-isolation-mean" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What Does “Isolation” Mean?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Transactions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-problems-that-happen-without-proper-isolation-anomalies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Problems That Happen Without Proper Isolation (Anomalies)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Problems That Happen Without Proper Isolation (Anomalies)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-dirty-read-reading-a-lie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Dirty Read (Reading a Lie)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1 Dirty Read (Reading a Lie)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-it-means" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it means
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-nonrepeatable-read-data-keeps-changing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Non‑Repeatable Read (Data Keeps Changing)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.2 Non‑Repeatable Read (Data Keeps Changing)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-it-means_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it means
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-phantom-read-new-rows-appear-like-ghosts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Phantom Read (New Rows Appear Like Ghosts)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.3 Phantom Read (New Rows Appear Like Ghosts)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-it-means_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it means
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-write-skew-very-important" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Write Skew (Very Important)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.4 Write Skew (Very Important)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-it-means_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it means
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-doctor-oncall-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example (Doctor On‑Call Rule)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-isolation-levels-big-picture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Isolation Levels (Big Picture)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-read-uncommitted-almost-never-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. READ UNCOMMITTED (Almost Never Used)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. READ UNCOMMITTED (Almost Never Used)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#idea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Idea
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-happens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What happens
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-read-committed-most-common" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. READ COMMITTED (Most Common)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. READ COMMITTED (Most Common)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#idea_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Idea
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mental-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mental Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-repeatable-read" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. REPEATABLE READ
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. REPEATABLE READ">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#idea_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Idea
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#but-phantom-reads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        But Phantom Reads?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-serializable-strongest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. SERIALIZABLE (Strongest)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. SERIALIZABLE (Strongest)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#idea_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Idea
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-dbs-actually-do-this" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How DBs Actually Do This
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-snapshot-isolation-reality-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Snapshot Isolation (Reality Check)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Snapshot Isolation (Reality Check)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-snapshot-means" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Snapshot Means
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problem
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-oneline-memory-trick" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. One‑Line Memory Trick
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-final-takeaway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Final Takeaway
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Database Isolation Level</h1>
+
+<p>[<img alt="Database Isolation Levels" src="../../Diagrams/Database_isolation_level_full.png" /></p>
+<p>This document explains <strong>isolation levels in database</strong>, using <strong>real examples</strong>, <strong>two transactions</strong>.</p>
+<hr />
+<h2 id="1-what-does-isolation-mean">1. What Does “Isolation” Mean?<a class="headerlink" href="#1-what-does-isolation-mean" title="Permanent link">&para;</a></h2>
+<p>Imagine <strong>many people using the same database at the same time</strong>.</p>
+<p>Isolation answers this question:</p>
+<blockquote>
+<p>"While I am doing my work, <strong>what changes from others am I allowed to see?</strong>"</p>
+</blockquote>
+<p>Transactions do <strong>NOT</strong> run one after another. They run <strong>together</strong>, but isolation controls <strong>what they can see</strong>.</p>
+<hr />
+<h2 id="2-transactions">2. Transactions<a class="headerlink" href="#2-transactions" title="Permanent link">&para;</a></h2>
+<p>A <strong>transaction</strong> is a group of steps that must happen together.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>BEGIN
+  Read balance
+  Update balance
+COMMIT
+</code></pre></div>
+<p>Either <strong>all steps succeed</strong> or <strong>none of them apply</strong>.</p>
+<hr />
+<h2 id="3-problems-that-happen-without-proper-isolation-anomalies">3. Problems That Happen Without Proper Isolation (Anomalies)<a class="headerlink" href="#3-problems-that-happen-without-proper-isolation-anomalies" title="Permanent link">&para;</a></h2>
+<p>Before learning isolation levels, understand these problems.</p>
+<hr />
+<h3 id="31-dirty-read-reading-a-lie">3.1 Dirty Read (Reading a Lie)<a class="headerlink" href="#31-dirty-read-reading-a-lie" title="Permanent link">&para;</a></h3>
+<h4 id="what-it-means">What it means<a class="headerlink" href="#what-it-means" title="Permanent link">&para;</a></h4>
+<p>You read data <strong>before the other person finishes their work</strong>.</p>
+<h4 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h4>
+<p>Initial balance = 100</p>
+<div class="highlight"><pre><span></span><code>T1 (Transaction 1)           T2 (Transaction 2)
+------------------           ------------------
+UPDATE balance = 0
+                              READ balance → 0 ❌
+ROLLBACK
+</code></pre></div>
+<p>Final balance is <strong>still 100</strong>, but T2 saw <strong>0</strong>, which never actually existed.</p>
+<p>📌 <strong>This is called a Dirty Read</strong></p>
+<hr />
+<h3 id="32-nonrepeatable-read-data-keeps-changing">3.2 Non‑Repeatable Read (Data Keeps Changing)<a class="headerlink" href="#32-nonrepeatable-read-data-keeps-changing" title="Permanent link">&para;</a></h3>
+<h4 id="what-it-means_1">What it means<a class="headerlink" href="#what-it-means_1" title="Permanent link">&para;</a></h4>
+<p>You read the <strong>same row twice</strong> and get <strong>different values</strong>.</p>
+<h4 id="example_1">Example<a class="headerlink" href="#example_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>T1                           T2
+------------------           ------------------
+READ balance → 100
+                              UPDATE balance = 200
+                              COMMIT
+READ balance → 200 ❌
+</code></pre></div>
+<p>T1 is confused: "I didn’t change anything, why did my data change?"</p>
+<p>📌 <strong>This is a Non‑Repeatable Read</strong></p>
+<hr />
+<h3 id="33-phantom-read-new-rows-appear-like-ghosts">3.3 Phantom Read (New Rows Appear Like Ghosts)<a class="headerlink" href="#33-phantom-read-new-rows-appear-like-ghosts" title="Permanent link">&para;</a></h3>
+<h4 id="what-it-means_2">What it means<a class="headerlink" href="#what-it-means_2" title="Permanent link">&para;</a></h4>
+<p>You run the <strong>same query twice</strong>, but the number of rows changes.</p>
+<h4 id="example_2">Example<a class="headerlink" href="#example_2" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>T1                           T2
+------------------           ------------------
+SELECT COUNT(*)
+WHERE salary &gt; 50k → 2
+                              INSERT salary = 70k
+                              COMMIT
+SELECT COUNT(*)
+WHERE salary &gt; 50k → 3 ❌
+</code></pre></div>
+<p>Rows appeared out of nowhere.</p>
+<p>📌 <strong>This is a Phantom Read</strong></p>
+<hr />
+<h3 id="34-write-skew-very-important">3.4 Write Skew (Very Important)<a class="headerlink" href="#34-write-skew-very-important" title="Permanent link">&para;</a></h3>
+<h4 id="what-it-means_3">What it means<a class="headerlink" href="#what-it-means_3" title="Permanent link">&para;</a></h4>
+<p>Two people make <strong>individually correct updates</strong>, but together they break a rule.</p>
+<h4 id="example-doctor-oncall-rule">Example (Doctor On‑Call Rule)<a class="headerlink" href="#example-doctor-oncall-rule" title="Permanent link">&para;</a></h4>
+<p>Rule: <strong>At least one doctor must be on call</strong></p>
+<div class="highlight"><pre><span></span><code>T1                           T2
+------------------           ------------------
+READ A=ON, B=ON              READ A=ON, B=ON
+SET A=OFF                    SET B=OFF
+COMMIT                       COMMIT
+</code></pre></div>
+<p>Final state:</p>
+<div class="highlight"><pre><span></span><code>A = OFF
+B = OFF ❌  (Rule broken)
+</code></pre></div>
+<p>📌 This happens even though <strong>no row conflict occurred</strong>.</p>
+<hr />
+<h2 id="4-isolation-levels-big-picture">4. Isolation Levels (Big Picture)<a class="headerlink" href="#4-isolation-levels-big-picture" title="Permanent link">&para;</a></h2>
+<p>Think of isolation levels as <strong>rules that block some of the problems above</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Isolation Level</th>
+<th>Dirty Read</th>
+<th>Non‑Repeatable</th>
+<th>Phantom</th>
+<th>Write Skew</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>READ UNCOMMITTED</td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>READ COMMITTED</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>REPEATABLE READ</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>SERIALIZABLE</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-read-uncommitted-almost-never-used">5. READ UNCOMMITTED (Almost Never Used)<a class="headerlink" href="#5-read-uncommitted-almost-never-used" title="Permanent link">&para;</a></h2>
+<h3 id="idea">Idea<a class="headerlink" href="#idea" title="Permanent link">&para;</a></h3>
+<p>"Read anything, even unfinished work."</p>
+<h3 id="what-happens">What happens<a class="headerlink" href="#what-happens" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p>Dirty reads allowed</p>
+</li>
+<li>
+<p>Data can be totally wrong</p>
+</li>
+</ul>
+<p>📌 <strong>Most real databases don’t even allow this</strong>.</p>
+<hr />
+<h2 id="6-read-committed-most-common">6. READ COMMITTED (Most Common)<a class="headerlink" href="#6-read-committed-most-common" title="Permanent link">&para;</a></h2>
+<h3 id="idea_1">Idea<a class="headerlink" href="#idea_1" title="Permanent link">&para;</a></h3>
+<p>"Only read <strong>committed</strong> data, but data may change later."</p>
+<h3 id="example_3">Example<a class="headerlink" href="#example_3" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>T1                           T2
+------------------           ------------------
+READ balance → 100
+                              UPDATE balance = 200
+                              COMMIT
+READ balance → 200  (allowed)
+</code></pre></div>
+<h3 id="mental-model">Mental Model<a class="headerlink" href="#mental-model" title="Permanent link">&para;</a></h3>
+<p>Each <strong>query</strong> gets a fresh view of committed data.</p>
+<p>📌 Default in PostgreSQL, Oracle, SQL Server</p>
+<hr />
+<h2 id="7-repeatable-read">7. REPEATABLE READ<a class="headerlink" href="#7-repeatable-read" title="Permanent link">&para;</a></h2>
+<h3 id="idea_2">Idea<a class="headerlink" href="#idea_2" title="Permanent link">&para;</a></h3>
+<p>"Once I read something, it should not change for me."</p>
+<h3 id="example_4">Example<a class="headerlink" href="#example_4" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>T1                           T2
+------------------           ------------------
+READ balance → 100
+                              UPDATE balance = 200
+                              COMMIT
+READ balance → 100  (same)
+</code></pre></div>
+<h3 id="but-phantom-reads">But Phantom Reads?<a class="headerlink" href="#but-phantom-reads" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>T1                           T2
+------------------           ------------------
+COUNT salary &gt; 50k → 2
+                              INSERT salary = 70k
+                              COMMIT
+COUNT salary &gt; 50k → 3 ❌
+</code></pre></div>
+<p>📌 Snapshot stays same for rows, not for ranges (DB‑dependent)</p>
+<hr />
+<h2 id="8-serializable-strongest">8. SERIALIZABLE (Strongest)<a class="headerlink" href="#8-serializable-strongest" title="Permanent link">&para;</a></h2>
+<h3 id="idea_3">Idea<a class="headerlink" href="#idea_3" title="Permanent link">&para;</a></h3>
+<p>"Behave as if transactions ran one after another."</p>
+<h3 id="example_5">Example<a class="headerlink" href="#example_5" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>T1 runs fully
+then
+T2 runs fully
+</code></pre></div>
+<h3 id="how-dbs-actually-do-this">How DBs Actually Do This<a class="headerlink" href="#how-dbs-actually-do-this" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p>They <strong>don’t block everything immediately</strong></p>
+</li>
+<li>
+<p>They detect conflicts</p>
+</li>
+<li>
+<p>They may <strong>abort one transaction</strong></p>
+</li>
+</ul>
+<p>📌 Safest but slowest</p>
+<hr />
+<h2 id="9-snapshot-isolation-reality-check">9. Snapshot Isolation (Reality Check)<a class="headerlink" href="#9-snapshot-isolation-reality-check" title="Permanent link">&para;</a></h2>
+<p>Most databases actually use <strong>snapshots</strong>, not pure locking.</p>
+<h3 id="what-snapshot-means">What Snapshot Means<a class="headerlink" href="#what-snapshot-means" title="Permanent link">&para;</a></h3>
+<p>"I see the database <strong>as it was when I started</strong>."</p>
+<h3 id="problem">Problem<a class="headerlink" href="#problem" title="Permanent link">&para;</a></h3>
+<p>Snapshot isolation <strong>does NOT stop write skew</strong>.</p>
+<p>That’s why:</p>
+<div class="highlight"><pre><span></span><code>REPEATABLE READ ≠ SERIALIZABLE
+</code></pre></div>
+<hr />
+<blockquote>
+<p>"Isolation controls which concurrency problems are allowed. Most systems use Read Committed for performance. Serializable is used only when correctness is critical because it may abort transactions."</p>
+</blockquote>
+<hr />
+<h2 id="10-oneline-memory-trick">10. One‑Line Memory Trick<a class="headerlink" href="#10-oneline-memory-trick" title="Permanent link">&para;</a></h2>
+<ul>
+<li>
+<p>Dirty Read → Reading unfinished work</p>
+</li>
+<li>
+<p>Non‑Repeatable → Same row changes</p>
+</li>
+<li>
+<p>Phantom → Row count changes</p>
+</li>
+<li>
+<p>Write Skew → Rule broken without conflict</p>
+</li>
+</ul>
+<hr />
+<h2 id="11-final-takeaway">11. Final Takeaway<a class="headerlink" href="#11-final-takeaway" title="Permanent link">&para;</a></h2>
+<p>Isolation is a <strong>trade‑off</strong>:</p>
+<ul>
+<li>
+<p>Higher isolation → safer but slower</p>
+</li>
+<li>
+<p>Lower isolation → faster but risky</p>
+</li>
+</ul>
+<p>choose isolation <strong>based on business rules</strong>, not defaults.</p>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tabs", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2436 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Visual notes and system design explanations with diagrams">
+      
+      
+      
+        <link rel="canonical" href="https://180101061.github.io/system-design-vault/Fundamentals/Non%20Relational%20Databases/">
+      
+      
+        <link rel="prev" href="../Sharding%20%26%20Partitioning/">
+      
+      
+        <link rel="next" href="../../CaseStudies/URL%20Shortener/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+    
+    
+      
+        <title>Non Relational Databases - System Design Vault</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1-introduction" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="System Design Vault" class="md-header__button md-logo" aria-label="System Design Vault" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            System Design Vault
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Non Relational Databases
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/180101061/system-design-vault" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    180101061/system-design-vault
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../CAP%20Theorem/" class="md-tabs__link">
+          
+  
+  
+  Fundamentals
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../CaseStudies/URL%20Shortener/" class="md-tabs__link">
+          
+  
+  
+  Case Studies
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../Diagrams/url_shortener.png" class="md-tabs__link">
+          
+  
+  
+  Diagrams
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="System Design Vault" class="md-nav__button md-logo" aria-label="System Design Vault" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    System Design Vault
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/180101061/system-design-vault" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    180101061/system-design-vault
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fundamentals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Fundamentals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CAP%20Theorem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CAP Theorem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Relational%20Database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Relational Database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Database%20Isolation%20Levels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Isolation Level
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Scaling%20Databases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling Databases
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Scalability%20Patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scalability Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Sharding%20%26%20Partitioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sharding & Partitioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non Relational Databases
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non Relational Databases
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-characteristics-of-nosql-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Characteristics of NoSQL Databases
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-types-of-nosql-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Types of NoSQL Databases
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#31-keyvalue-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Key–Value Databases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1 Key–Value Databases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#structure-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structure Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advantages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advantages
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Cases
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#32-document-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Document Databases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.2 Document Databases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#structure-example_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structure Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#features_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advantages_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advantages
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-cases_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Cases
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#33-column-family-wide-column-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Column-Family (Wide Column) Databases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.3 Column-Family (Wide Column) Databases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#features_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advantages_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advantages
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitations_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-cases_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Cases
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#34-graph-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Graph Databases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.4 Graph Databases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#features_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advantages_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advantages
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitations_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-cases_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Cases
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-acid-vs-base" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. ACID vs BASE
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. ACID vs BASE">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#acid-used-in-rdbms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ACID (Used in RDBMS)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#base-used-in-nosql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BASE (Used in NoSQL)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-cap-theorem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. CAP Theorem
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-horizontal-vs-vertical-scaling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Horizontal vs Vertical Scaling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Sharding
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-comparison-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Comparison Table
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-advantages-of-nosql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Advantages of NoSQL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-disadvantages-of-nosql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Disadvantages of NoSQL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-common-interview-questions-with-short-answers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Common Interview Questions (With Short Answers)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. Common Interview Questions (With Short Answers)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-what-is-nosql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1) What is NoSQL?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-when-should-you-use-nosql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2) When should you use NoSQL?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-what-is-eventual-consistency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3) What is eventual consistency?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-what-is-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4) What is sharding?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-difference-between-mongodb-and-cassandra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5) Difference between MongoDB and Cassandra?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-what-problems-are-graph-databases-best-at" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6) What problems are graph databases best at?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-short-exam-definition-45-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Short Exam Definition (4–5 lines)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Case Studies
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Case Studies
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CaseStudies/URL%20Shortener/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    URL Shortener
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CaseStudies/Load Balancer.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Load Balancer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diagrams
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Diagrams
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Diagrams/url_shortener.png" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    URL Shortener
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-characteristics-of-nosql-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Characteristics of NoSQL Databases
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-types-of-nosql-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Types of NoSQL Databases
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#31-keyvalue-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Key–Value Databases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1 Key–Value Databases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#structure-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structure Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advantages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advantages
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Cases
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#32-document-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Document Databases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.2 Document Databases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#structure-example_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structure Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#features_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advantages_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advantages
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-cases_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Cases
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#33-column-family-wide-column-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Column-Family (Wide Column) Databases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.3 Column-Family (Wide Column) Databases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#features_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advantages_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advantages
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitations_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-cases_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Cases
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#34-graph-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Graph Databases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.4 Graph Databases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definition_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#features_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advantages_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advantages
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitations_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-cases_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Cases
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-acid-vs-base" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. ACID vs BASE
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. ACID vs BASE">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#acid-used-in-rdbms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ACID (Used in RDBMS)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#base-used-in-nosql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BASE (Used in NoSQL)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-cap-theorem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. CAP Theorem
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-horizontal-vs-vertical-scaling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Horizontal vs Vertical Scaling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Sharding
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-comparison-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Comparison Table
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-advantages-of-nosql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Advantages of NoSQL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-disadvantages-of-nosql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Disadvantages of NoSQL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-common-interview-questions-with-short-answers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Common Interview Questions (With Short Answers)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. Common Interview Questions (With Short Answers)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-what-is-nosql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1) What is NoSQL?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-when-should-you-use-nosql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2) When should you use NoSQL?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-what-is-eventual-consistency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3) What is eventual consistency?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-what-is-sharding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4) What is sharding?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-difference-between-mongodb-and-cassandra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5) Difference between MongoDB and Cassandra?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-what-problems-are-graph-databases-best-at" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6) What problems are graph databases best at?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-short-exam-definition-45-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Short Exam Definition (4–5 lines)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<p><img alt="Non_Relational_Databases" src="../../Diagrams/Non_Relational_Databases.png" /></p>
+<h2 id="1-introduction">1. Introduction<a class="headerlink" href="#1-introduction" title="Permanent link">&para;</a></h2>
+<p>A <strong>Non-Relational Database (NoSQL)</strong> is a database that does not use the traditional relational table-based structure (rows and columns with fixed schema).
+NoSQL databases are designed for:
+- Large-scale data storage
+- Distributed systems
+- High availability
+- Flexible schema
+- Horizontal scalability
+NoSQL databases typically follow <strong>BASE</strong> consistency rather than strict <strong>ACID</strong> transactions.</p>
+<hr />
+<h1 id="2-characteristics-of-nosql-databases">2. Characteristics of NoSQL Databases<a class="headerlink" href="#2-characteristics-of-nosql-databases" title="Permanent link">&para;</a></h1>
+<ul>
+<li>Schema-less or flexible schema</li>
+<li>Horizontally scalable (scale-out architecture)</li>
+<li>Designed for distributed systems</li>
+<li>High read/write performance</li>
+<li>Supports unstructured and semi-structured data</li>
+</ul>
+<hr />
+<h1 id="3-types-of-nosql-databases">3. Types of NoSQL Databases<a class="headerlink" href="#3-types-of-nosql-databases" title="Permanent link">&para;</a></h1>
+<p>There are <strong>four main types</strong>:
+1. Key–Value Stores
+2. Document Databases
+3. Column-Family (Wide Column) Databases
+4. Graph Databases</p>
+<hr />
+<h1 id="31-keyvalue-databases">3.1 Key–Value Databases<a class="headerlink" href="#31-keyvalue-databases" title="Permanent link">&para;</a></h1>
+<h2 id="definition">Definition<a class="headerlink" href="#definition" title="Permanent link">&para;</a></h2>
+<p>A Key–Value database stores data in the form:
+Key → Value
+The database treats the value as an opaque object.</p>
+<h2 id="structure-example">Structure Example<a class="headerlink" href="#structure-example" title="Permanent link">&para;</a></h2>
+<p><code>User123 → {Name: Rahul, Age: 22}</code></p>
+<h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Very fast lookups</li>
+<li>Simple structure</li>
+<li>Highly scalable</li>
+</ul>
+<h2 id="advantages">Advantages<a class="headerlink" href="#advantages" title="Permanent link">&para;</a></h2>
+<ul>
+<li>O(1) lookup by key</li>
+<li>Simple design</li>
+<li>Excellent for caching</li>
+</ul>
+<h2 id="limitations">Limitations<a class="headerlink" href="#limitations" title="Permanent link">&para;</a></h2>
+<ul>
+<li>No complex querying</li>
+<li>No joins</li>
+<li>Cannot search inside value (in most cases)</li>
+</ul>
+<h2 id="use-cases">Use Cases<a class="headerlink" href="#use-cases" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Session storage</li>
+<li>Caching</li>
+<li>User preferences</li>
+<li>Shopping carts</li>
+</ul>
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Redis</li>
+<li>Amazon DynamoDB</li>
+</ul>
+<hr />
+<h1 id="32-document-databases">3.2 Document Databases<a class="headerlink" href="#32-document-databases" title="Permanent link">&para;</a></h1>
+<h2 id="definition_1">Definition<a class="headerlink" href="#definition_1" title="Permanent link">&para;</a></h2>
+<p>A Document database stores data in documents (usually JSON or BSON format).
+Each document:
+- Has unique ID
+- Contains key-value pairs
+- Can have nested objects
+- Does not require fixed schema</p>
+<h2 id="structure-example_1">Structure Example<a class="headerlink" href="#structure-example_1" title="Permanent link">&para;</a></h2>
+<p><code>{   "id": 1,   "name": "Rahul",   "skills": ["Java", "Python"],   "address": {       "city": "Bangalore"   } }</code></p>
+<h2 id="features_1">Features<a class="headerlink" href="#features_1" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Flexible schema</li>
+<li>Supports indexing</li>
+<li>Supports rich queries</li>
+</ul>
+<h2 id="advantages_1">Advantages<a class="headerlink" href="#advantages_1" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Easy to modify structure</li>
+<li>Good for evolving applications</li>
+<li>Developer-friendly</li>
+</ul>
+<h2 id="limitations_1">Limitations<a class="headerlink" href="#limitations_1" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Limited join support</li>
+<li>Data duplication possible</li>
+</ul>
+<h2 id="use-cases_1">Use Cases<a class="headerlink" href="#use-cases_1" title="Permanent link">&para;</a></h2>
+<ul>
+<li>E-commerce websites</li>
+<li>Content management systems</li>
+<li>User profile systems</li>
+</ul>
+<h2 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h2>
+<ul>
+<li>MongoDB</li>
+<li>CouchDB</li>
+</ul>
+<hr />
+<h1 id="33-column-family-wide-column-databases">3.3 Column-Family (Wide Column) Databases<a class="headerlink" href="#33-column-family-wide-column-databases" title="Permanent link">&para;</a></h1>
+<h2 id="definition_2">Definition<a class="headerlink" href="#definition_2" title="Permanent link">&para;</a></h2>
+<p>Data is stored in column families instead of rows.
+Unlike relational databases:
+- Each row can have different columns
+- Columns are grouped into families
+- Optimized for distributed storage</p>
+<h2 id="features_2">Features<a class="headerlink" href="#features_2" title="Permanent link">&para;</a></h2>
+<ul>
+<li>High write performance</li>
+<li>Massive scalability</li>
+<li>Distributed architecture</li>
+</ul>
+<h2 id="advantages_2">Advantages<a class="headerlink" href="#advantages_2" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Handles huge data volumes</li>
+<li>Suitable for big data</li>
+<li>Good for time-series data</li>
+</ul>
+<h2 id="limitations_2">Limitations<a class="headerlink" href="#limitations_2" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Complex data modeling</li>
+<li>Limited transactional support</li>
+</ul>
+<h2 id="use-cases_2">Use Cases<a class="headerlink" href="#use-cases_2" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Logging systems</li>
+<li>IoT data</li>
+<li>Analytics platforms</li>
+<li>Real-time big data processing</li>
+</ul>
+<h2 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Apache Cassandra</li>
+<li>Apache HBase</li>
+</ul>
+<hr />
+<h1 id="34-graph-databases">3.4 Graph Databases<a class="headerlink" href="#34-graph-databases" title="Permanent link">&para;</a></h1>
+<h2 id="definition_3">Definition<a class="headerlink" href="#definition_3" title="Permanent link">&para;</a></h2>
+<p>Graph databases store data as:
+- Nodes (Entities)
+- Edges (Relationships)
+- Properties (Attributes)
+Designed to efficiently handle highly connected data.</p>
+<h2 id="features_3">Features<a class="headerlink" href="#features_3" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Relationship-first model</li>
+<li>Fast graph traversal</li>
+<li>No complex joins needed</li>
+</ul>
+<h2 id="advantages_3">Advantages<a class="headerlink" href="#advantages_3" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Efficient for multi-level relationships</li>
+<li>Natural modeling of connected systems</li>
+<li>Good for network analysis</li>
+</ul>
+<h2 id="limitations_3">Limitations<a class="headerlink" href="#limitations_3" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Not ideal for heavy aggregation</li>
+<li>Overkill for simple CRUD apps</li>
+</ul>
+<h2 id="use-cases_3">Use Cases<a class="headerlink" href="#use-cases_3" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Social networks</li>
+<li>Fraud detection</li>
+<li>Recommendation systems</li>
+<li>Knowledge graphs</li>
+</ul>
+<h2 id="examples_3">Examples<a class="headerlink" href="#examples_3" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Neo4j</li>
+<li>Amazon Neptune</li>
+</ul>
+<hr />
+<h1 id="4-acid-vs-base">4. ACID vs BASE<a class="headerlink" href="#4-acid-vs-base" title="Permanent link">&para;</a></h1>
+<h2 id="acid-used-in-rdbms">ACID (Used in RDBMS)<a class="headerlink" href="#acid-used-in-rdbms" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Atomicity</li>
+<li>Consistency</li>
+<li>Isolation</li>
+<li>Durability
+Ensures strong transactional guarantees.</li>
+</ul>
+<hr />
+<h2 id="base-used-in-nosql">BASE (Used in NoSQL)<a class="headerlink" href="#base-used-in-nosql" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Basically Available</li>
+<li>Soft State</li>
+<li>Eventually Consistent
+Prioritizes availability and scalability over strict consistency.</li>
+</ul>
+<hr />
+<h1 id="5-cap-theorem">5. CAP Theorem<a class="headerlink" href="#5-cap-theorem" title="Permanent link">&para;</a></h1>
+<p>CAP theorem states that a distributed system can guarantee only two of the following three:
+- Consistency
+- Availability
+- Partition Tolerance
+Most NoSQL systems choose:
+- AP (Availability + Partition tolerance)<br />
+    or
+- CP (Consistency + Partition tolerance)</p>
+<hr />
+<h1 id="6-horizontal-vs-vertical-scaling">6. Horizontal vs Vertical Scaling<a class="headerlink" href="#6-horizontal-vs-vertical-scaling" title="Permanent link">&para;</a></h1>
+<p>Vertical Scaling:
+- Add more power (CPU, RAM) to single server.
+Horizontal Scaling:
+- Add more servers.
+- Data is distributed using sharding.
+NoSQL databases are designed for horizontal scaling.</p>
+<hr />
+<h1 id="7-sharding">7. Sharding<a class="headerlink" href="#7-sharding" title="Permanent link">&para;</a></h1>
+<p>Sharding is horizontal partitioning of data across multiple servers to distribute load and improve performance.
+Example:<br />
+Users 1–1000 → Server A<br />
+Users 1001–2000 → Server B</p>
+<hr />
+<h1 id="8-comparison-table">8. Comparison Table<a class="headerlink" href="#8-comparison-table" title="Permanent link">&para;</a></h1>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Key-Value</th>
+<th>Document</th>
+<th>Column-Family</th>
+<th>Graph</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Structure</td>
+<td>Key → Value</td>
+<td>JSON Document</td>
+<td>Column Families</td>
+<td>Nodes &amp; Edges</td>
+</tr>
+<tr>
+<td>Schema</td>
+<td>None</td>
+<td>Flexible</td>
+<td>Semi-structured</td>
+<td>Flexible</td>
+</tr>
+<tr>
+<td>Query Power</td>
+<td>Low</td>
+<td>Medium-High</td>
+<td>Medium</td>
+<td>High (relationships)</td>
+</tr>
+<tr>
+<td>Best For</td>
+<td>Caching</td>
+<td>Web apps</td>
+<td>Big data</td>
+<td>Connected data</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="9-advantages-of-nosql">9. Advantages of NoSQL<a class="headerlink" href="#9-advantages-of-nosql" title="Permanent link">&para;</a></h1>
+<ul>
+<li>High scalability</li>
+<li>Handles big data</li>
+<li>Flexible schema</li>
+<li>High availability</li>
+<li>Faster development</li>
+</ul>
+<hr />
+<h1 id="10-disadvantages-of-nosql">10. Disadvantages of NoSQL<a class="headerlink" href="#10-disadvantages-of-nosql" title="Permanent link">&para;</a></h1>
+<ul>
+<li>Limited transactions</li>
+<li>No complex joins</li>
+<li>Data redundancy</li>
+<li>Eventual consistency issues</li>
+</ul>
+<hr />
+<h1 id="11-common-interview-questions-with-short-answers">11. Common Interview Questions (With Short Answers)<a class="headerlink" href="#11-common-interview-questions-with-short-answers" title="Permanent link">&para;</a></h1>
+<h3 id="1-what-is-nosql">1) What is NoSQL?<a class="headerlink" href="#1-what-is-nosql" title="Permanent link">&para;</a></h3>
+<p>NoSQL is a non-relational database designed for distributed data storage, flexible schema, and horizontal scalability.</p>
+<hr />
+<h3 id="2-when-should-you-use-nosql">2) When should you use NoSQL?<a class="headerlink" href="#2-when-should-you-use-nosql" title="Permanent link">&para;</a></h3>
+<ul>
+<li>When handling big data</li>
+<li>When schema changes frequently</li>
+<li>When high scalability is required</li>
+<li>When joins are not needed</li>
+</ul>
+<hr />
+<h3 id="3-what-is-eventual-consistency">3) What is eventual consistency?<a class="headerlink" href="#3-what-is-eventual-consistency" title="Permanent link">&para;</a></h3>
+<p>Data updates will propagate to all nodes over time but not immediately.</p>
+<hr />
+<h3 id="4-what-is-sharding">4) What is sharding?<a class="headerlink" href="#4-what-is-sharding" title="Permanent link">&para;</a></h3>
+<p>Sharding is splitting data across multiple machines to improve scalability.</p>
+<hr />
+<h3 id="5-difference-between-mongodb-and-cassandra">5) Difference between MongoDB and Cassandra?<a class="headerlink" href="#5-difference-between-mongodb-and-cassandra" title="Permanent link">&para;</a></h3>
+<p>MongoDB is a document database, while Cassandra is a column-family database optimized for large distributed systems.</p>
+<hr />
+<h3 id="6-what-problems-are-graph-databases-best-at">6) What problems are graph databases best at?<a class="headerlink" href="#6-what-problems-are-graph-databases-best-at" title="Permanent link">&para;</a></h3>
+<p>Path finding, recommendation systems, fraud detection, and social networks.</p>
+<hr />
+<h1 id="12-short-exam-definition-45-lines">12. Short Exam Definition (4–5 lines)<a class="headerlink" href="#12-short-exam-definition-45-lines" title="Permanent link">&para;</a></h1>
+<p>Non-Relational databases (NoSQL) are distributed, schema-flexible databases designed for large-scale and high-performance applications. The main types are Key-Value, Document, Column-Family, and Graph databases. They typically follow BASE consistency and scale horizontally across multiple servers.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tabs", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
